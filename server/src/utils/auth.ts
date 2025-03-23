@@ -5,25 +5,25 @@ import {
   type Response,
 } from "express";
 import jwt from "jsonwebtoken";
-import { hash } from "ohash";
+import crypto from "node:crypto";
 import { resJson } from "./res.js";
 import { BaseState } from "./state.js";
 
-// 生成 32 位 hash 字符串
-export const secretKey = hash(`${Date.now() + Math.random()}`);
+// secretKey.length === 32
+export const secretKey = crypto.randomBytes(16).toString("hex");
 
 export function auth(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization;
   if (!token) {
-    return resJson(res, BaseState.TokenErr);
+    return resJson(res, BaseState.TokenInvalid);
   }
 
   jwt.verify(token, secretKey, (err, decoded) => {
     if (err) {
-      return resJson(res, BaseState.TokenErr);
+      return resJson(res, BaseState.TokenInvalid);
     } else {
       // todo
-      console.log("decoded:", decoded);
+      console.log("[utils/auth] decoded:", decoded);
       req.cookies.email = decoded;
       next();
     }

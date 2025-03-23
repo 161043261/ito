@@ -1,18 +1,18 @@
 // 1xxx base
 export enum BaseState {
-  ServerErr = 1001, // 服务器错误
-  TokenErr = 1002, // token 过期或错误
-  ParamErr = 1003, // 参数错误
-  CreateErr = 1004, // 创建失败
-  UpdateErr = 1005, // 更新失败
+  ServerErr = 1001,
+  TokenInvalid = 1002, // error or expired
+  ParamErr = 1003,
+  CreateFailed = 1004,
+  UpdateFailed = 1005,
 }
 
 // 2xxx auth
 export enum AuthState {
-  EmailOrPassErr = 2001, // 邮箱或密码错误
-  UserLoggedIn = 2002, // 用户已登录
-  UserRegistered = 2003, // 用户已注册
-  UserNotRegistered = 2004, // 用户未注册
+  EmailOrPassErr = 2001,
+  UserLoggedIn = 2002,
+  UserRegistered = 2003,
+  UserNotRegistered = 2004,
 }
 
 // 3xxx friend
@@ -20,43 +20,43 @@ export enum FriendState {}
 
 // 4xxx group
 export enum GroupState {
-  YouHasJoined = 4001, // 您已加入群聊
-  FriendHasJoined = 4002, // 好友已加入群聊
+  YouHasJoined = 4001,
+  FriendHasJoined = 4002,
 }
 
 // 5xxx msg
 
 // 6xxx file
 export enum FileState {
-  FileUploaded = 6001, // 文件已上传
-  ChunksUploaded = 6002, // 全部分块已上传, 未合并
+  FileUploaded = 6001,
+  ChunksUploaded = 6002, // pending for merge
 }
 
 export const Code2Msg = new Map<number, string>([
-  [200, "成功"],
+  [200, "Success"],
 
   // 1xxx base
-  [1001, "服务器错误"],
-  [1002, "token 过期或错误"],
-  [1003, "参数错误"],
-  [1004, "创建失败"],
-  [1005, "更新失败"],
+  [1001, "Server error"],
+  [1002, "Token error or expired"],
+  [1003, "Parameters error"],
+  [1004, "Create failed"],
+  [1005, "Update failed"],
 
-  // 2xxx aut]h
-  [2001, "邮箱或密码错误"],
-  [2002, "用户已登录"],
-  [2003, "用户已注册"],
-  [2004, "用户未注册"],
+  // 2xxx auth
+  [2001, "Email or password error"],
+  [2002, "User logged in"],
+  [2003, "User registered"],
+  [2004, "User not registered"],
 
-  // 3xxx frien]d]
+  // 3xxx friend
 
-  // 4xxx grou]p
-  [4001, "您已加入群聊"],
-  [4002, "好友已加入群聊"],
+  // 4xxx group
+  [4001, "You has joined the group"],
+  [4002, "Friend has joined the group"],
 
-  // 5xxx ms]g]
+  // 5xxx msg
 
-  // 6xxx fil]e
-  [6001, "文件已上传"],
-  [6002, "全部分块已上传, 未合并"],
+  // 6xxx file
+  [6001, "File uploaded"],
+  [6002, "Chunks uploaded"], // pending for merge
 ]);
