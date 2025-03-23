@@ -1,8 +1,8 @@
-import { defineConfig } from "eslint/config";
-import config from "eslint-config-standard";
+// @ts-check
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
 
-
-export default defineConfig([
-  { files: ["**/*.{js,mjs,cjs}"] },
-  config,
-]);
+export default tseslint.config(
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
+);
