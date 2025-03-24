@@ -6,6 +6,7 @@ import express, {
 } from "express";
 import expressWs from "express-ws";
 import bodyParser from "body-parser";
+import createAuthRouter from "./auth.js";
 
 const app = express();
 expressWs(app);
@@ -48,5 +49,8 @@ const staticHandler: RequestHandler = (req, res, next) => {
 // 跨域
 app.use("", corsHandler);
 app.use("/upload", staticHandler, express.static("upload"));
+
+const authRouter = createAuthRouter();
+app.use("/api/v1/auth", corsHandler, authRouter);
 
 export default app;

@@ -2,12 +2,18 @@ import mysql from "mysql";
 import fs from "node:fs";
 import path from "node:path";
 
+// mysql:8.4
+// docker logs --follow mysql_container
+// docker exec -it mysql_container bash
+// ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY 'pass';
+// flush privileges;
+// create database db0;
 let conf = {
-  host: "127.0.0.1",
+  host: "localhost",
   port: 3306,
   user: "root",
   password: "pass",
-  db: "db0",
+  database: "db0",
 };
 const confPath = path.join(process.cwd(), "./conf.json");
 if (fs.existsSync(confPath)) {
@@ -25,21 +31,27 @@ const pool = mysql.createPool({
 
 function createUsers() {
   const sql = `
+-- 用户表
 create table if not exists users
 (
+  -- 用户 ID
   id         int(31)      not null auto_increment primary key,
+  -- 用户邮箱
   email      varchar(255) not null unique,
+  -- 用户密码
   password   varchar(255) not null,
+  -- 用户头像
   avatar     varchar(255) null,
+  -- 用户名
   username   varchar(255) null,
-  salt       varchar(255) not null,
+  -- 签名
   signature  longtext     null,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp on update
+  created_at datetime  default current_timestamp,
+  updated_at timestamp default current_timestamp on update current_timestamp
 ) engine = InnoDB
-  default charset = utf8mb4;
-  `;
-
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+`;
   pool.query(sql, (err) => {
     if (err) {
       console.error("[model/db]", err);
@@ -49,23 +61,33 @@ create table if not exists users
 
 function createFriends() {
   const sql = `
+-- 朋友表
 create table if not exists friends
 (
+  -- 朋友 ID
   id         int(31)      not null auto_increment primary key,
+  -- 所属用户 ID
   user_id    int(31)      not null,
+  -- 朋友邮箱
   email      varchar(255) not null,
+  -- 朋友头像
   avatar     varchar(255) null,
+  -- 朋友状态
   state      enum ('online', 'offline') default 'offline',
+  -- 朋友备注
   note_name  varchar(255),
+  -- 朋友的标签 ID
   tag_id     int(31),
+  -- 未读消息数
   unread_cnt int(31)                    default 0,
   created_at timestamp                  default current_timestamp,
   updated_at timestamp                  default current_timestamp on update current_timestamp,
   index idx_tag_id (tag_id),
   foreign key (tag_id) references tags (id) on delete set null
 ) engine = InnoDB
-  default charset = utf8mb4;
-  `;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+`;
   pool.query(sql, (err) => {
     if (err) {
       console.error("[model/db]", err);
@@ -75,19 +97,25 @@ create table if not exists friends
 
 function createTags() {
   const sql = `
+-- 标签表
 create table if not exists tags
 (
+  -- 标签 ID
   id         int(31)      not null auto_increment primary key,
+  -- 所属用户 ID
   user_id    int(31)      not null,
-  email      varchar(255) not null,
-  tag_name   varchar(255) not null,
+  -- 所属用户邮箱
+  user_email varchar(255) not null,
+  -- 标签名
+  name       varchar(255) not null,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
   index idx_user_id (user_id),
   foreign key (user_id) references users (id) on delete cascade
 ) engine = InnoDB
-  default charset = utf8mb4;
-  `;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+`;
   pool.query(sql, (err) => {
     if (err) {
       console.error("[model/db]", err);
@@ -99,21 +127,29 @@ create table if not exists tags
 
 function createGroups() {
   const sql = `
+-- 群聊表
 create table if not exists \`groups\`
 (
+  -- 群聊 ID
   id         int(31)      not null auto_increment primary key,
-  group_name varchar(255) not null,
-  owner_id   int(31)      not null,
+  -- 群聊名
+  name varchar(255) not null,
+  -- 群主的用户 ID
+  owner_id int(31)      not null,
+  -- 群聊头像
   avatar     varchar(255),
+  -- 群公告
   readme     text,
+  -- 房间号
   room_num   varchar(255) not null unique,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
-  index idx_owner_id (owner_id),
+  index idx_creator_id (owner_id),
   foreign key (owner_id) references users (id) on delete cascade
 ) engine = InnoDB
-  charset = utf8mb4;
-  `;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+`;
   pool.query(sql, (err) => {
     if (err) {
       console.error("[model/db]", err);
@@ -124,11 +160,16 @@ create table if not exists \`groups\`
 
 function createGroupMembers() {
   const sql = `
+-- 群聊成员表
 create table if not exists group_members
 (
+  -- 成员 ID
   id         int(31)      not null auto_increment primary key,
+  -- 成员昵称
   nickname   varchar(255) not null,
+  -- 群聊 ID
   group_id   int(31)      not null,
+  -- 成员的用户 ID
   user_id    int(31)      not null,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
@@ -136,8 +177,9 @@ create table if not exists group_members
   index idx_user_id (user_id),
   foreign key (group_id) references \`groups\` (id) on delete cascade
 ) engine = InnoDB
-  charset = utf8mb4;
-  `;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+`;
   pool.query(sql, (err) => {
     if (err) {
       console.error("[model/db]", err);
@@ -147,22 +189,33 @@ create table if not exists group_members
 
 function createMessages() {
   const sql = `
+-- 消息表
 create table if not exists messages
 (
-  id          int(31)                                 not null auto_increment,
+  -- 消息 ID
+  id          int(31)                                 not null auto_increment primary key,
+  -- 发送方的用户 ID
   sender_id   int(31)                                 not null,
+  -- 接收方的用户 ID
   receiver_id int(31)                                 not null,
+  -- 消息内容
   content     longtext                                not null,
+  -- 房间号
   room_num    varchar(255)                            not null,
-  msg_type    enum ('private', 'public')              not null,
+  -- 消息类型
+  type        enum ('private', 'public')              not null,
+  -- 媒体类型
   media_type  enum ('text', 'image', 'video', 'file') not null,
+  -- 文件大小, 单位 B
   file_size   int(31)                                 null     default 0,
-  msg_state   int(1)                                  not null default 0,
+  -- 消息状态
+  state       int(1)                                  not null default 0,
   created_at  timestamp                                        default current_timestamp,
   foreign key (sender_id) references users (id) on delete cascade on update cascade
 ) engine = InnoDB
-  charset = utf8mb4;
-  `;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+`;
   pool.query(sql, (err) => {
     if (err) {
       console.error("[model/db]", err);
@@ -173,17 +226,22 @@ create table if not exists messages
 
 function createMsgStats() {
   const sql = `
+-- 消息统计表
 create table if not exists msg_stats
 (
+  -- 消息统计 ID
   id         int(31)      not null auto_increment,
+  -- 房间号
   room_num   varchar(255) not null,
+  -- 消息总数
   total      int(255)     not null,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
   primary key (id)
 ) engine = InnoDB
-  charset = utf8mb4;
-  `;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+`;
   pool.query(sql, (err) => {
     if (err) {
       console.error("[model/db]", err);

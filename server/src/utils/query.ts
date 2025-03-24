@@ -1,9 +1,9 @@
-import db from "../model/db.js";
+import pool from "../model/index.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function query(sql: string, values: any): Promise<any> {
   return new Promise((resolve, reject) => {
-    db.query(
+    pool.query(
       {
         sql,
         values,

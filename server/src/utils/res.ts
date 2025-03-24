@@ -15,9 +15,9 @@ export function resJson(res: Response, code?: number, data?: any) {
 }
 
 export function resErr(res: Response, code: number) {
-  resJson(res, code);
+  resJson(res, code /** code */, "" /** data */);
 }
 
-export function resOk(res: Response, code?: number, data?: any) {
-  resJson(res, code ?? 200, data ?? "");
+export function resOk(res: Response, data?: any, code?: number) {
+  resJson(res, code ?? 200 /** code */, data ?? "" /** data */);
 }

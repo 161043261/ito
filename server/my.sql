@@ -1,6 +1,11 @@
 -- https://github.com/161043161/ito
 use db0;
 
+drop table if exists users;
+drop table if exists friends;
+drop table if exists tags;
+drop table if exists `groups`;
+
 -- 用户表
 create table if not exists users
 (
@@ -14,14 +19,13 @@ create table if not exists users
   avatar     varchar(255) null,
   -- 用户名
   username   varchar(255) null,
-  -- 盐值
-  salt       varchar(255) not null,
   -- 签名
   signature  longtext     null,
-  created_at timestamp default current_timestamp,
+  created_at datetime  default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp
 ) engine = InnoDB
-  default charset = utf8mb4;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
 
 
 -- 朋友表
@@ -48,7 +52,8 @@ create table if not exists friends
   index idx_tag_id (tag_id),
   foreign key (tag_id) references tags (id) on delete set null
 ) engine = InnoDB
-  default charset = utf8mb4;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
 
 -- 标签表
 create table if not exists tags
@@ -58,15 +63,16 @@ create table if not exists tags
   -- 所属用户 ID
   user_id    int(31)      not null,
   -- 所属用户邮箱
-  email      varchar(255) not null,
+  user_email varchar(255) not null,
   -- 标签名
-  tag_name   varchar(255) not null,
+  name       varchar(255) not null,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
   index idx_user_id (user_id),
   foreign key (user_id) references users (id) on delete cascade
 ) engine = InnoDB
-  default charset = utf8mb4;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
 
 -- 群聊表
 create table if not exists `groups`
@@ -74,9 +80,9 @@ create table if not exists `groups`
   -- 群聊 ID
   id         int(31)      not null auto_increment primary key,
   -- 群聊名
-  group_name varchar(255) not null,
+  name varchar(255) not null,
   -- 群主的用户 ID
-  owner_id   int(31)      not null,
+  owner_id int(31)      not null,
   -- 群聊头像
   avatar     varchar(255),
   -- 群公告
@@ -85,10 +91,11 @@ create table if not exists `groups`
   room_num   varchar(255) not null unique,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
-  index idx_owner_id (owner_id),
+  index idx_creator_id (owner_id),
   foreign key (owner_id) references users (id) on delete cascade
 ) engine = InnoDB
-  charset = utf8mb4;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
 
 
 -- 群聊成员表
@@ -108,13 +115,14 @@ create table if not exists group_members
   index idx_user_id (user_id),
   foreign key (group_id) references `groups` (id) on delete cascade
 ) engine = InnoDB
-  charset = utf8mb4;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
 
 -- 消息表
 create table if not exists messages
 (
   -- 消息 ID
-  id          int(31)                                 not null auto_increment,
+  id          int(31)                                 not null auto_increment primary key,
   -- 发送方的用户 ID
   sender_id   int(31)                                 not null,
   -- 接收方的用户 ID
@@ -124,17 +132,18 @@ create table if not exists messages
   -- 房间号
   room_num    varchar(255)                            not null,
   -- 消息类型
-  msg_type    enum ('private', 'public')              not null,
+  type        enum ('private', 'public')              not null,
   -- 媒体类型
   media_type  enum ('text', 'image', 'video', 'file') not null,
   -- 文件大小, 单位 B
   file_size   int(31)                                 null     default 0,
   -- 消息状态
-  msg_state   int(1)                                  not null default 0,
+  state       int(1)                                  not null default 0,
   created_at  timestamp                                        default current_timestamp,
   foreign key (sender_id) references users (id) on delete cascade on update cascade
 ) engine = InnoDB
-  charset = utf8mb4;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
 
 -- 消息统计表
 create table if not exists msg_stats
@@ -149,4 +158,5 @@ create table if not exists msg_stats
   updated_at timestamp default current_timestamp on update current_timestamp,
   primary key (id)
 ) engine = InnoDB
-  charset = utf8mb4;
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
