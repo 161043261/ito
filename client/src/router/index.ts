@@ -12,6 +12,6 @@ export const routes: IRoute[] = [
   {
     key: 'Home',
     path: '/',
-    element: withGuard(lazy(() => import('@/pages/home'))),
+    element: withGuard(lazy(() => import('@/pages/home/index.tsx'))),
   },
 ];
