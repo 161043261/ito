@@ -1,3 +1,5 @@
+import { App as AntdApp } from 'antd';
+
 export default function App() {
-  return <div>App</div>;
+  return <AntdApp></AntdApp>;
 }

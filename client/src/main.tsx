@@ -1,10 +1,29 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import './assets/tailwind.css';
+// i18n
+import zhCN from 'antd/es/locale/zh_CN';
+import { BrowserRouter } from 'react-router';
+import { ConfigProvider } from 'antd';
+import App from './App';
 
-createRoot(document.getElementById('root')!).render(
+const container = document.getElementById('root') as HTMLDivElement;
+const root = createRoot(container);
+
+root.render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: '#00b96b',
+            borderRadius: 16,
+          },
+        }}
+        locale={zhCN}
+      >
+        <App />
+      </ConfigProvider>
+    </BrowserRouter>
   </StrictMode>,
-)
+);
