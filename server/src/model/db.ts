@@ -34,7 +34,8 @@ create table if not exists users
   username   varchar(255) null,
   salt       varchar(255) not null,
   signature  longtext     null,
-  created_at datetime default current_timestamp
+  created_at timestamp default current_timestamp,
+  updated_at timestamp default current_timestamp on update
 ) engine = InnoDB
   default charset = utf8mb4;
   `;
@@ -55,7 +56,7 @@ create table if not exists friends
   email      varchar(255) not null,
   avatar     varchar(255) null,
   state      enum ('online', 'offline') default 'offline',
-  remark     varchar(255),
+  note_name  varchar(255),
   tag_id     int(31),
   unread_cnt int(31)                    default 0,
   created_at timestamp                  default current_timestamp,
@@ -102,14 +103,14 @@ create table if not exists \`groups\`
 (
   id         int(31)      not null auto_increment primary key,
   group_name varchar(255) not null,
-  creator_id int(31)      not null,
+  owner_id   int(31)      not null,
   avatar     varchar(255),
   readme     text,
   room_num   varchar(255) not null unique,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
-  index idx_creator_id (creator_id),
-  foreign key (creator_id) references users (id) on delete cascade
+  index idx_owner_id (owner_id),
+  foreign key (owner_id) references users (id) on delete cascade
 ) engine = InnoDB
   charset = utf8mb4;
   `;

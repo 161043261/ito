@@ -1,46 +1,47 @@
-# https://github.com/161043161/ito
+-- https://github.com/161043161/ito
 use db0;
 
-# 用户表
+-- 用户表
 create table if not exists users
 (
-  # 用户 ID
+  -- 用户 ID
   id         int(31)      not null auto_increment primary key,
-  # 用户邮箱
+  -- 用户邮箱
   email      varchar(255) not null unique,
-  # 用户密码
+  -- 用户密码
   password   varchar(255) not null,
-  # 用户头像
+  -- 用户头像
   avatar     varchar(255) null,
-  # 用户名
+  -- 用户名
   username   varchar(255) null,
-  # 盐值
+  -- 盐值
   salt       varchar(255) not null,
-  # 签名
+  -- 签名
   signature  longtext     null,
-  created_at datetime default current_timestamp
+  created_at timestamp default current_timestamp,
+  updated_at timestamp default current_timestamp on update current_timestamp
 ) engine = InnoDB
   default charset = utf8mb4;
 
 
-# 好友表
+-- 朋友表
 create table if not exists friends
 (
-  # 好友 ID
+  -- 朋友 ID
   id         int(31)      not null auto_increment primary key,
-  # 好友的用户 ID
+  -- 所属用户 ID
   user_id    int(31)      not null,
-  # 好友的用户 email
+  -- 朋友邮箱
   email      varchar(255) not null,
-  # 好友的用户 avatar
+  -- 朋友头像
   avatar     varchar(255) null,
-  # 好友状态
+  -- 朋友状态
   state      enum ('online', 'offline') default 'offline',
-  # 好友备注
-  remark     varchar(255),
-  # 好友的标签 ID
+  -- 朋友备注
+  note_name  varchar(255),
+  -- 朋友的标签 ID
   tag_id     int(31),
-  # 未读消息数
+  -- 未读消息数
   unread_cnt int(31)                    default 0,
   created_at timestamp                  default current_timestamp,
   updated_at timestamp                  default current_timestamp on update current_timestamp,
@@ -49,16 +50,16 @@ create table if not exists friends
 ) engine = InnoDB
   default charset = utf8mb4;
 
-# 标签表
+-- 标签表
 create table if not exists tags
 (
-  # 标签 ID
+  -- 标签 ID
   id         int(31)      not null auto_increment primary key,
-  # 用户 ID
+  -- 所属用户 ID
   user_id    int(31)      not null,
-  # 用户 email
+  -- 所属用户邮箱
   email      varchar(255) not null,
-  # 标签名
+  -- 标签名
   tag_name   varchar(255) not null,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
@@ -67,39 +68,39 @@ create table if not exists tags
 ) engine = InnoDB
   default charset = utf8mb4;
 
-# 群聊表
+-- 群聊表
 create table if not exists `groups`
 (
-  # 群聊 ID
+  -- 群聊 ID
   id         int(31)      not null auto_increment primary key,
-  # 群聊名
+  -- 群聊名
   group_name varchar(255) not null,
-  # 创建者的用户 ID
-  creator_id int(31)      not null,
-  # 群聊头像
+  -- 群主的用户 ID
+  owner_id   int(31)      not null,
+  -- 群聊头像
   avatar     varchar(255),
-  # 群公告
+  -- 群公告
   readme     text,
-  # 房间号
+  -- 房间号
   room_num   varchar(255) not null unique,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
-  index idx_creator_id (creator_id),
-  foreign key (creator_id) references users (id) on delete cascade
+  index idx_owner_id (owner_id),
+  foreign key (owner_id) references users (id) on delete cascade
 ) engine = InnoDB
   charset = utf8mb4;
 
 
-# 群聊成员表
+-- 群聊成员表
 create table if not exists group_members
 (
-  # 成员 ID
+  -- 成员 ID
   id         int(31)      not null auto_increment primary key,
-  # 成员昵称
+  -- 成员昵称
   nickname   varchar(255) not null,
-  # 群聊 ID
+  -- 群聊 ID
   group_id   int(31)      not null,
-  # 成员的用户 ID
+  -- 成员的用户 ID
   user_id    int(31)      not null,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
@@ -109,40 +110,40 @@ create table if not exists group_members
 ) engine = InnoDB
   charset = utf8mb4;
 
-# 消息表
+-- 消息表
 create table if not exists messages
 (
-  # 消息 ID
+  -- 消息 ID
   id          int(31)                                 not null auto_increment,
-  # 发送方的用户 ID
+  -- 发送方的用户 ID
   sender_id   int(31)                                 not null,
-  # 接收方的用户 ID
+  -- 接收方的用户 ID
   receiver_id int(31)                                 not null,
-  # 消息内容
+  -- 消息内容
   content     longtext                                not null,
-  # 房间号
+  -- 房间号
   room_num    varchar(255)                            not null,
-  # 消息类型
+  -- 消息类型
   msg_type    enum ('private', 'public')              not null,
-  # 媒体类型
+  -- 媒体类型
   media_type  enum ('text', 'image', 'video', 'file') not null,
-  # 文件大小, 单位 B
+  -- 文件大小, 单位 B
   file_size   int(31)                                 null     default 0,
-  # 消息状态
+  -- 消息状态
   msg_state   int(1)                                  not null default 0,
   created_at  timestamp                                        default current_timestamp,
   foreign key (sender_id) references users (id) on delete cascade on update cascade
 ) engine = InnoDB
   charset = utf8mb4;
 
-# 消息统计表
+-- 消息统计表
 create table if not exists msg_stats
 (
-  # 消息统计 ID
+  -- 消息统计 ID
   id         int(31)      not null auto_increment,
-  # 房间号
+  -- 房间号
   room_num   varchar(255) not null,
-  # 消息总数
+  -- 消息总数
   total      int(255)     not null,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
