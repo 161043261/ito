@@ -105,7 +105,6 @@ export async function register(req: Request, res: Response) {
       email,
       password: saltedPwd,
       username: username,
-      signature: "",
     };
     const sql2 = `insert into user set ?`;
     const results2 = await query(sql2, user);
@@ -133,7 +132,6 @@ export async function register(req: Request, res: Response) {
       info: {
         ...payload,
         avatar,
-        signature: "",
       },
     };
     return resOk(res, data);
