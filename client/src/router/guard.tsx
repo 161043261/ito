@@ -11,7 +11,7 @@ const GuardComponent: React.FC<IProps> = (props: IProps) => {
   const { node } = props;
   const hasToken = sessionStorage.getItem('token');
   if (hasToken) {
-    return <>{node}</>; // node
+    return node
   }
   return <Navigate to="/login" />; // 重定向, 会改变 url
   // return <Login />; // 仅渲染组件, 不会改变 url

@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { Spin } from 'antd';
 import { IRoute } from './conf';
 import { Navigate, Route, Routes } from 'react-router';
@@ -21,7 +20,7 @@ const RouterPage = () => {
           path={route.path}
           element={
             route.redirect ? (
-              <Navigate to={route.path} />
+              <Navigate to={route.redirect} />
             ) : (
               <Suspense fallback={<AntdSpin />}>
                 <route.element />
