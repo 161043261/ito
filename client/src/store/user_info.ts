@@ -44,6 +44,6 @@ export const createUserInfoStore: StateCreator<IUserInfoState> = (set) => {
   };
 };
 
-const useAuthTokenStore = create<IUserInfoState>(createUserInfoStore);
+const useTokenStore = create<IUserInfoState>(createUserInfoStore);
 
-export default useAuthTokenStore;
+export default useTokenStore;

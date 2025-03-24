@@ -9,6 +9,15 @@ export default defineConfig({
   // server: {
   //   open: true,
   // },
+
+  //! tsconfig.app.json
+  // {
+  //   "compilerOptions": {
+  //     "paths": {
+  //       "@/*": ["./src/*"]
+  //     }
+  //   }
+  // }
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

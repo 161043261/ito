@@ -7,7 +7,7 @@ interface IProps {
 }
 
 const GuardComponent: React.FC<IProps> = (props: IProps) => {
-  // const tokenStore = useAuthTokenStore();
+  // const tokenStore = useTokenStore();
   const { node } = props;
   const hasToken = sessionStorage.getItem('token');
   if (hasToken) {

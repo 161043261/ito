@@ -1,5 +1,9 @@
-const App: React.FC = () => {
-  return <div></div>;
-};
+const Home: React.FC = () => {
+  return (
+    <div>
 
-export default App;
+    </div>
+  )
+}
+
+export default Home
