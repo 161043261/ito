@@ -1,3 +1,4 @@
+import { IUserInfo } from '@/types/user';
 import { create, StateCreator } from 'zustand';
 
 const emptyUser = {
@@ -6,13 +7,6 @@ const emptyUser = {
   avatar: '',
   username: '',
 };
-
-export interface IUserInfo {
-  email: string;
-  password: string;
-  avatar: string;
-  username: string;
-}
 
 export interface IUserInfoState extends IUserInfo {
   getUserInfo: () => IUserInfo;

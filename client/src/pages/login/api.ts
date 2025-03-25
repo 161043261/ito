@@ -1,4 +1,4 @@
-import { ILoginReqData, ILoginResData } from './type';
+import { ILoginReqData, ILoginResData } from '@/types/user';
 import request from '@/utils/req';
 
 export async function loginApi(data: ILoginReqData) {

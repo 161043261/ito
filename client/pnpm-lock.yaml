@@ -78,9 +78,6 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.6.11
         version: 0.6.11(prettier@3.5.3)
-      sass:
-        specifier: ^1.86.0
-        version: 1.86.0
       typescript:
         specifier: ~5.7.2
         version: 5.7.3
@@ -2919,6 +2916,7 @@ snapshots:
   chokidar@4.0.3:
     dependencies:
       readdirp: 4.1.2
+    optional: true
 
   classnames@2.5.1: {}
 
@@ -3218,7 +3216,8 @@ snapshots:
 
   ignore@5.3.2: {}
 
-  immutable@5.0.3: {}
+  immutable@5.0.3:
+    optional: true
 
   import-fresh@3.3.1:
     dependencies:
@@ -3754,7 +3753,8 @@ snapshots:
 
   react@19.0.0: {}
 
-  readdirp@4.1.2: {}
+  readdirp@4.1.2:
+    optional: true
 
   regenerator-runtime@0.14.1: {}
 
@@ -3801,6 +3801,7 @@ snapshots:
       source-map-js: 1.2.1
     optionalDependencies:
       '@parcel/watcher': 2.5.1
+    optional: true
 
   scheduler@0.25.0: {}
 

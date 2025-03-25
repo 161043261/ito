@@ -1,15 +1,15 @@
 import useToast from '@/hooks/use_toast';
 import useTokenStore, { ITokenState } from '@/store/token';
-import useUserInfoStore, { IUserInfo } from '@/store/user_info';
+import useUserInfoStore from '@/store/user_info';
 import { decrypt, encrypt, genRandStr } from '@/utils/crypt';
 import { Button, Checkbox, Form, Input } from 'antd';
 import { useEffect, useState } from 'react';
-import { ILoginReqData } from './type';
 import { Link, useNavigate } from 'react-router';
 import { loginApi } from './api';
 import { BaseState } from '@/utils/constants';
 import styled from 'styled-components';
 import bg from '@/assets/images/bg.jpg';
+import { IUserInfo, ILoginReqData } from '@/types/user';
 
 async function writeLocal(tokenStore: ITokenState, userInfo: IUserInfo) {
   const userInfoStr = await encrypt(JSON.stringify(userInfo));

@@ -1,4 +1,9 @@
-import { IUserInfo } from '@/store/user_info';
+export interface IUserInfo {
+  email: string;
+  password: string;
+  avatar: string;
+  username: string;
+}
 
 export interface ILoginReqData {
   email: string;
