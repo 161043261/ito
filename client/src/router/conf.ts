@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { withGuard } from './guard';
 import Login from '@/pages/login';
+import Register from '@/pages/register';
 
 export interface IRoute {
   key?: string; // name
@@ -33,4 +34,9 @@ export const routes: IRoute[] = [
     path: '/login',
     element: Login,
   },
+  {
+    key: 'Register',
+    path: '/register',
+    element: Register
+  }
 ];

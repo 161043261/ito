@@ -1,11 +1,6 @@
 -- https://github.com/161043161/ito
 use db0;
 
-drop table if exists users;
-drop table if exists friends;
-drop table if exists tags;
-drop table if exists `groups`;
-
 -- 用户表
 create table if not exists users
 (
@@ -15,10 +10,10 @@ create table if not exists users
   email      varchar(255) not null unique,
   -- 用户密码
   password   varchar(255) not null,
-  -- 用户头像
-  avatar     varchar(255) null,
   -- 用户名
   username   varchar(255) null,
+  -- 用户头像
+  avatar     varchar(255) null,
   created_at datetime  default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp
 ) engine = InnoDB
@@ -26,23 +21,23 @@ create table if not exists users
   collate = utf8mb4_unicode_ci;
 
 
--- 朋友表
+-- 好友表
 create table if not exists friends
 (
-  -- 朋友 ID
+  -- 好友 ID
   id         int(31)      not null auto_increment primary key,
   -- 所属用户 ID
   user_id    int(31)      not null,
-  -- 朋友邮箱
+  -- 好友邮箱
   email      varchar(255) not null,
-  -- 朋友头像
+  -- 好友头像
   avatar     varchar(255) null,
-  -- 朋友状态
-  state      enum ('online', 'offline') default 'offline',
-  -- 朋友备注
+  -- 好友备注
   note_name  varchar(255),
-  -- 朋友的标签 ID
+  -- 好友的标签 ID
   tag_id     int(31),
+  -- 好友状态
+  state      enum ('online', 'offline') default 'offline',
   -- 未读消息数
   unread_cnt int(31)                    default 0,
   created_at timestamp                  default current_timestamp,
@@ -78,15 +73,19 @@ create table if not exists `groups`
   -- 群聊 ID
   id         int(31)      not null auto_increment primary key,
   -- 群聊名
-  name varchar(255) not null,
+  name       varchar(255) not null,
   -- 群主的用户 ID
-  owner_id int(31)      not null,
+  owner_id   int(31)      not null,
+  -- 房间号
+  room_num   varchar(255) not null unique,
   -- 群聊头像
   avatar     varchar(255),
   -- 群公告
   readme     text,
-  -- 房间号
-  room_num   varchar(255) not null unique,
+  -- 群聊备注
+  note_name  varchar(255),
+  -- 未读消息数
+  unread_cnt int(31)   default 0,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
   index idx_creator_id (owner_id),
