@@ -46,7 +46,7 @@ export async function login(req: Request, res: Response) {
     const token = jwt.sign(payload, secretKey);
     const data = {
       token,
-      info: {
+      userInfo: {
         ...payload,
         password,
         avatar: results[0].avatar,
@@ -129,7 +129,7 @@ export async function register(req: Request, res: Response) {
     const token = jwt.sign(payload, secretKey);
     const data = {
       token,
-      info: {
+      userInfo: {
         ...payload,
         avatar,
       },

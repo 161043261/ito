@@ -14,16 +14,16 @@ interface IRes<T> {
 }
 
 export class Req {
-  private axiosIns: AxiosInstance;
+  private axiosInst: AxiosInstance;
   private defaultConfig: AxiosRequestConfig = {
     baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 6000,
   };
   private constructor(config_: AxiosRequestConfig = {}) {
     const config = { ...this.defaultConfig, ...config_ };
-    this.axiosIns = axios.create(config);
+    this.axiosInst = axios.create(config);
 
-    this.axiosIns.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+    this.axiosInst.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       const token = this.getToken();
       if (token) {
         config.headers.Authorization = token;
@@ -31,7 +31,7 @@ export class Req {
       return config;
     }, Promise.reject /** (err: AxiosError) => Promise.reject(err) */);
 
-    this.axiosIns.interceptors.response.use(
+    this.axiosInst.interceptors.response.use(
       (res: AxiosResponse) => {
         return res;
       },
@@ -44,14 +44,14 @@ export class Req {
 
   // todo: fix eslint error
   public request(config: AxiosRequestConfig): Promise<any> {
-    return this.axiosIns.request(config);
+    return this.axiosInst.request(config);
   }
 
   public get<TResData = any>(
     url: string,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<IRes<TResData>>> {
-    return this.axiosIns.get(url, config);
+    return this.axiosInst.get(url, config);
   }
 
   public post<TReqData = any, TResData = any>(
@@ -59,7 +59,7 @@ export class Req {
     data?: TReqData,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<IRes<TResData>>> {
-    return this.axiosIns.post(url, data, config);
+    return this.axiosInst.post(url, data, config);
   }
 
   public put<TReqData = any, TResData = any>(
@@ -67,14 +67,14 @@ export class Req {
     data?: TReqData,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<IRes<TResData>>> {
-    return this.axiosIns.put(url, data, config);
+    return this.axiosInst.put(url, data, config);
   }
 
   public delete<TResDaa = any>(
     url: string,
     config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<IRes<TResDaa>>> {
-    return this.axiosIns.delete(url, config);
+    return this.axiosInst.delete(url, config);
   }
 
   private getToken(): string | null {
@@ -93,4 +93,4 @@ export class Req {
   }
 }
 
-export default Req.request
+export default Req.request;

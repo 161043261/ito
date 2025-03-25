@@ -15,6 +15,7 @@ export interface IUserInfo {
 }
 
 export interface IUserInfoState extends IUserInfo {
+  getUserInfo: () => IUserInfo;
   setUserInfo: (userInfo: IUserInfo) => void;
   clearUserInfo: () => void;
 }
@@ -30,6 +31,14 @@ export const createUserInfoStore: StateCreator<IUserInfoState> = (set) => {
     password,
     avatar,
     username,
+    getUserInfo: () => {
+      return {
+        email,
+        password,
+        avatar,
+        username,
+      };
+    },
     setUserInfo: (userInfo_: IUserInfo) => {
       set((state: IUserInfoState) => {
         const userInfo = { ...state, ...userInfo_ };

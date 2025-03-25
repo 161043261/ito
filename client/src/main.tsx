@@ -1,6 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import './assets/tailwind.css';
+import '@/assets/styles/tailwind.css';
+import '@/assets/styles/global.scss';
+
 // i18n
 import zhCN from 'antd/es/locale/zh_CN';
 import { BrowserRouter } from 'react-router';

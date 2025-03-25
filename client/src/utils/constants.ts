@@ -1,5 +1,6 @@
 // 1xxx base
 export enum BaseState {
+  Success = 200,
   ServerErr = 1001,
   TokenInvalid = 1002, // error or expired
   ParamErr = 1003,
@@ -33,30 +34,30 @@ export enum FileState {
 }
 
 export const Code2Msg = new Map<number, string>([
-  [200, "Success"],
+  [200, 'Success'],
 
   // 1xxx base
-  [1001, "Server error"],
-  [1002, "Token error or expired"],
-  [1003, "Parameters error"],
-  [1004, "Create failed"],
-  [1005, "Update failed"],
+  [1001, 'Server error'],
+  [1002, 'Token error or expired'],
+  [1003, 'Parameters error'],
+  [1004, 'Create failed'],
+  [1005, 'Update failed'],
 
   // 2xxx auth
-  [2001, "Email or password error"],
-  [2002, "User logged in"],
-  [2003, "User registered"],
-  [2004, "User not registered"],
+  [2001, 'Email or password error'],
+  [2002, 'User logged in'],
+  [2003, 'User registered'],
+  [2004, 'User not registered'],
 
   // 3xxx friend
 
   // 4xxx group
-  [4001, "You has joined the group"],
-  [4002, "Friend has joined the group"],
+  [4001, 'You has joined the group'],
+  [4002, 'Friend has joined the group'],
 
   // 5xxx msg
 
   // 6xxx file
-  [6001, "File uploaded"],
-  [6002, "Chunks uploaded"], // pending for merge
+  [6001, 'File uploaded'],
+  [6002, 'Chunks uploaded'], // pending for merge
 ]);

@@ -1,5 +1,6 @@
 // 1xxx base
 export enum BaseState {
+  Success = 200,
   ServerErr = 1001,
   TokenInvalid = 1002, // error or expired
   ParamErr = 1003,

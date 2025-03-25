@@ -7,5 +7,5 @@ export interface ILoginReqData {
 
 export interface ILoginResData {
   token: string;
-  info: IUserInfo;
+  userInfo: IUserInfo;
 }
