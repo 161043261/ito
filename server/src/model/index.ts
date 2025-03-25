@@ -198,9 +198,9 @@ create table if not exists messages
 (
   -- 消息 ID
   id          int(31)                                 not null auto_increment primary key,
-  -- 发送方的用户 ID
+  -- 发送者的用户 ID
   sender_id   int(31)                                 not null,
-  -- 接收方的用户 ID
+  -- 接收者的用户 ID
   receiver_id int(31)                                 not null,
   -- 消息内容
   content     longtext                                not null,

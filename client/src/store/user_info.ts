@@ -1,37 +1,33 @@
 import { IUserInfo } from '@/types/user';
 import { create, StateCreator } from 'zustand';
 
-const emptyUser = {
+const emptyUserInfo = {
   email: '',
   password: '',
   avatar: '',
   username: '',
+  signature: '',
 };
 
-export interface IUserInfoState extends IUserInfo {
-  getUserInfo: () => IUserInfo;
+export interface IUserInfoState {
+  userInfo: IUserInfo;
   setUserInfo: (userInfo: IUserInfo) => void;
   clearUserInfo: () => void;
 }
 
 export const createUserInfoStore: StateCreator<IUserInfoState> = (set) => {
-  const user = {
-    ...emptyUser,
+  const userInfo = {
+    ...emptyUserInfo,
     ...JSON.parse(sessionStorage.getItem('userInfo') ?? '{}'),
   };
-  const { email, password, avatar, username } = user;
+  const { email, password, avatar, username, signature } = userInfo;
   return {
-    email,
-    password,
-    avatar,
-    username,
-    getUserInfo: () => {
-      return {
-        email,
-        password,
-        avatar,
-        username,
-      };
+    userInfo: {
+      email,
+      password,
+      avatar,
+      username,
+      signature,
     },
     setUserInfo: (userInfo_: IUserInfo) => {
       set((state: IUserInfoState) => {
@@ -42,7 +38,7 @@ export const createUserInfoStore: StateCreator<IUserInfoState> = (set) => {
     },
     clearUserInfo: () => {
       sessionStorage.clear();
-      return { ...emptyUser };
+      return { ...emptyUserInfo };
     },
   };
 };

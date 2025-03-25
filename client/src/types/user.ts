@@ -35,8 +35,9 @@ export interface IRegisterResData {
   };
 }
 
-export interface ChatItem {
-  chatId: number; // 好友 ID 或群聊 ID
-  noteName: string; // 好友备注或群聊名
-  receiverName: string; // 好友的用户名, 有该字段, 表示是单聊, 不是群聊
+export interface IReceiverInfo {
+  email: string;
+  username: string; // 用户名 username
+  alias: string; // 备注 noteName 或群昵称 nickname 或用户名 username
+  avatar: string;
 }

@@ -94,7 +94,7 @@ const Login: React.FC = () => {
     if (newIsRemember) {
       localStorage.setItem('isRemember', `${newIsRemember}`);
       localStorage.setItem('token', tokenStore.token);
-      localStorage.setItem('userInfo', JSON.stringify(userInfoStore.getUserInfo()));
+      localStorage.setItem('userInfo', JSON.stringify(userInfoStore.userInfo));
     } else {
       // localStorage.clear()
       localStorage.removeItem('token');
