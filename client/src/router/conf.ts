@@ -24,7 +24,7 @@ export const routes: IRoute[] = [
       },
       {
         key: 'Contact',
-        path: 'contact',
+        path: 'contact', // 通讯录
         element: withGuard(lazy(() => import('@/pages/home'))),
       },
     ],
@@ -38,5 +38,11 @@ export const routes: IRoute[] = [
     key: 'Register',
     path: '/register',
     element: Register,
+  },
+  {
+    key: 'Fallback',
+    path: '*',
+    element: lazy(() => import('@/pages/fallback')),
+    redirect: '/',
   },
 ];
