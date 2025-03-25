@@ -43,7 +43,9 @@ create table if not exists users
   -- 用户名
   username   varchar(255) null,
   -- 用户头像
-  avatar     varchar(255) null,
+  avatar     longtext     null,
+  -- 用户签名
+  signature  longtext     null,
   created_at datetime  default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp
 ) engine = InnoDB
@@ -69,7 +71,7 @@ create table if not exists friends
   -- 好友邮箱
   email      varchar(255) not null,
   -- 好友头像
-  avatar     varchar(255) null,
+  avatar     longtext     null,
   -- 好友备注
   note_name  varchar(255),
   -- 好友的标签 ID
@@ -137,7 +139,7 @@ create table if not exists \`groups\`
   -- 房间号
   room_num   varchar(255) not null unique,
   -- 群聊头像
-  avatar     varchar(255),
+  avatar     longtext,
   -- 群公告
   readme     text,
   -- 群聊备注

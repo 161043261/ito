@@ -1,8 +1,10 @@
 export interface IUserInfo {
+  // ! email, password, username, avatar, signature
   email: string;
   password: string;
   avatar: string;
   username: string;
+  signature?: string;
 }
 
 export interface ILoginReqData {
@@ -13,6 +15,24 @@ export interface ILoginReqData {
 export interface ILoginResData {
   token: string;
   userInfo: IUserInfo;
+}
+
+export interface IRegisterReqData {
+  email: string;
+  password: string;
+  avatar: string; // random
+}
+
+export interface IRegisterResData {
+  token: string;
+  userInfo: {
+    //! email, password, username, avatar, signature
+    id: number;
+    email: string;
+    username: string;
+    avatar: string;
+    signature: string;
+  };
 }
 
 export interface ChatItem {

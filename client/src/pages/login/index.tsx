@@ -15,14 +15,11 @@ import styles from './index.module.scss';
 
 // styled-components
 const BgContainer = styled.div`
-  background: no-repeat center;
+  background: center no-repeat;
   background-size: cover;
   background-image: url(${bg});
   width: 100vw;
   height: 100vh;
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
 `;
 
 const Login: React.FC = () => {
@@ -60,7 +57,7 @@ const Login: React.FC = () => {
     return { userInfo, token };
   }
 
-  const handleFinish = async (form: ILoginForm) => {
+  const handleSubmit = async (form: ILoginForm) => {
     const { email, password } = form;
     const ret = await readLocal();
     if (ret && ret.userInfo.email === email) {
@@ -73,8 +70,8 @@ const Login: React.FC = () => {
     }
 
     setLoading(true);
-    const params = { email, password };
-    const res = await loginApi(params);
+    const payload = { email, password };
+    const res = await loginApi(payload);
     if (res.code === BaseState.Success && res.data) {
       toast.success('登录成功');
       setLoading(false);
@@ -131,12 +128,24 @@ const Login: React.FC = () => {
       <div
         className={`${styles.loginContainer} absolute top-[50%] left-[10%] w-100 translate-y-[-50%] px-7`}
       >
-        <h1 className="my-5 text-3xl text-slate-700">登录页</h1>
-        <Form onFinish={handleFinish} form={loginForm}>
-          <Form.Item name="email" rules={[{ required: true, message: '请输入邮箱' }]}>
-            <Input placeholder="请输入邮箱" maxLength={15} />
+        <h1 className="my-5 text-3xl text-slate-700">欢迎登录</h1>
+        <Form onFinish={handleSubmit} form={loginForm}>
+          <Form.Item
+            name="email"
+            rules={[
+              { required: true, message: '请输入邮箱' },
+              { max: 30, message: '邮箱最多 30 个字符' },
+            ]}
+          >
+            <Input placeholder="请输入邮箱" maxLength={30} />
           </Form.Item>
-          <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
+          <Form.Item
+            name="password"
+            rules={[
+              { required: true, message: '请输入密码' },
+              { max: 15, message: '密码最多 15 个字符' },
+            ]}
+          >
             <Input placeholder="请输入密码" maxLength={15} />
           </Form.Item>
           <Form.Item>
@@ -155,7 +164,7 @@ const Login: React.FC = () => {
                 登录
               </Button>
               <div className="">
-                <Link to="/register">注册</Link>
+                <Link to="/register">没有账号? 去注册</Link>
               </div>
             </div>
           </Form.Item>

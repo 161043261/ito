@@ -23,4 +23,16 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    proxy: {
+      '^/api/v1': {
+        target: 'http://127.0.0.1:3000',
+        changeOrigin: true,
+        rewrite: (path) => {
+          console.log("[vite.config] path:", path);
+          return path.replace(/^\/api\/v/, '/api');
+        },
+      },
+    },
+  },
 });

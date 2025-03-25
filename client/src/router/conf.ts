@@ -37,6 +37,6 @@ export const routes: IRoute[] = [
   {
     key: 'Register',
     path: '/register',
-    element: Register
-  }
+    element: Register,
+  },
 ];

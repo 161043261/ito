@@ -34,30 +34,30 @@ export enum FileState {
 }
 
 export const Code2Msg = new Map<number, string>([
-  [200, "Success"],
+  [200, "成功"],
 
   // 1xxx base
-  [1001, "Server error"],
-  [1002, "Token error or expired"],
-  [1003, "Parameters error"],
-  [1004, "Create failed"],
-  [1005, "Update failed"],
+  [1001, "服务器错误"],
+  [1002, "令牌错误或过期"],
+  [1003, "参数错误"],
+  [1004, "创建失败"],
+  [1005, "更新失败"],
 
   // 2xxx auth
-  [2001, "Email or password error"],
-  [2002, "User logged in"],
-  [2003, "User registered"],
-  [2004, "User not registered"],
+  [2001, "邮箱或密码错误"],
+  [2002, "用户已登录"],
+  [2003, "用户已注册"],
+  [2004, "用户未注册"],
 
   // 3xxx friend
 
   // 4xxx group
-  [4001, "You has joined the group"],
-  [4002, "Friend has joined the group"],
+  [4001, "你已加入群聊"],
+  [4002, "好友已加入群聊"],
 
   // 5xxx msg
 
   // 6xxx file
-  [6001, "File uploaded"],
-  [6002, "Chunks uploaded"], // pending for merge
+  [6001, "文件已上传"],
+  [6002, "分块已上传, 等待合并"], // pending for merge
 ]);

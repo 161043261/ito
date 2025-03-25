@@ -7,13 +7,13 @@ import axios, {
   AxiosError,
 } from 'axios';
 
-interface IRes<T> {
+interface IResponse<T> {
   code: number;
   msg: string;
   data: T;
 }
 
-export class Req {
+export class _Request {
   private axiosInst: AxiosInstance;
   private defaultConfig: AxiosRequestConfig = {
     baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -21,6 +21,7 @@ export class Req {
   };
   private constructor(config_: AxiosRequestConfig = {}) {
     const config = { ...this.defaultConfig, ...config_ };
+    console.log('[utils/request] config.baseURL:', import.meta.env.VITE_API_BASE_URL);
     this.axiosInst = axios.create(config);
 
     this.axiosInst.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -50,7 +51,7 @@ export class Req {
   public get<TResData = any>(
     url: string,
     config?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<IRes<TResData>>> {
+  ): Promise<AxiosResponse<IResponse<TResData>>> {
     return this.axiosInst.get(url, config);
   }
 
@@ -58,7 +59,7 @@ export class Req {
     url: string,
     data?: TReqData,
     config?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<IRes<TResData>>> {
+  ): Promise<AxiosResponse<IResponse<TResData>>> {
     return this.axiosInst.post(url, data, config);
   }
 
@@ -66,14 +67,14 @@ export class Req {
     url: string,
     data?: TReqData,
     config?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<IRes<TResData>>> {
+  ): Promise<AxiosResponse<IResponse<TResData>>> {
     return this.axiosInst.put(url, data, config);
   }
 
   public delete<TResDaa = any>(
     url: string,
     config?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<IRes<TResDaa>>> {
+  ): Promise<AxiosResponse<IResponse<TResDaa>>> {
     return this.axiosInst.delete(url, config);
   }
 
@@ -84,13 +85,13 @@ export class Req {
   }
 
   // design pattern --> creational --> singleton
-  static #req: Req;
-  public static get request(): Req {
-    if (!Req.#req) {
-      Req.#req = new Req();
+  static #req: _Request;
+  public static get request(): _Request {
+    if (!_Request.#req) {
+      _Request.#req = new _Request();
     }
-    return Req.#req;
+    return _Request.#req;
   }
 }
 
-export default Req.request;
+export default _Request.request;
