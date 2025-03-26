@@ -8,7 +8,7 @@ import { Link, useNavigate } from 'react-router';
 import styled from 'styled-components';
 import bg from '@/assets/images/bg.jpg';
 
-import styles from './index.module.scss';
+import styles from './register.module.scss';
 import { Button, Form, Input } from 'antd';
 
 // styled-components
@@ -36,12 +36,12 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      const payload = {
+      const reqData = {
         email,
         password,
         avatar: genBase64Img(),
       };
-      const res = await registerApi(payload);
+      const res = await registerApi(reqData);
       setLoading(false);
       if (res.code === BaseState.Success) {
         toast.success('注册成功');

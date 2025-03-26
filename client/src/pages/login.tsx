@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import bg from '@/assets/images/bg.jpg';
 import { IUserInfo, ILoginReqData } from '@/types/user';
 
-import styles from './index.module.scss';
+import styles from './login.module.scss';
 
 // styled-components
 const BgContainer = styled.div`
@@ -70,8 +70,8 @@ const Login: React.FC = () => {
     }
 
     setLoading(true);
-    const payload = { email, password };
-    const res = await loginApi(payload);
+    const reqData = { email, password };
+    const res = await loginApi(reqData);
     if (res.code === BaseState.Success && res.data) {
       toast.success('登录成功');
       setLoading(false);

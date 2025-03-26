@@ -4,16 +4,19 @@ import ImageContainer from '@/components/image_container';
 import useToast from '@/hooks/use_toast';
 import useUserInfoStore from '@/store/user_info';
 import { IFriendItem, IGroupItem } from '@/types/chat';
-import { IChatRef, IContactRef } from '@/types/fc_expose';
+import { IChatBoxRef, IContactRef } from '@/types/fc_expose';
 import { IReceiverInfo } from '@/types/user';
 import { BaseState } from '@/utils/constants';
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { IconItem, IconKey, IconList } from '@/utils/icons';
+
 import styled from 'styled-components';
+import ChatBox from './chat';
+import Contact from './contact';
 
 const BgContainer = styled.div`
-  background: var(--color-green5);
   width: 100vw;
   height: 100vh;
 `;
@@ -24,6 +27,8 @@ const Home: React.FC = () => {
   const userInfoStore = useUserInfoStore();
   const userInfo = userInfoStore.userInfo;
 
+  // 选中的图标
+  const [curIconKey, setCurIconKey] = useState<IconKey>('MessageEmoji');
   // 更新密码的弹窗
   const [mountPwdModal, setMountPwdModal] = useState(false);
   // 更新用户信息的弹窗
@@ -33,7 +38,7 @@ const Home: React.FC = () => {
   // 视频聊天弹窗
   const [mountVideoModal, setMountVideoModal] = useState(false);
   // 选中的单聊或群聊
-  const [selectedChat, setSelectedChat] = useState<IFriendItem | IGroupItem | null>(null);
+  const [curChat, setCurChat] = useState<IFriendItem | IGroupItem | null>(null);
   // 房间号
   const [roomKey, setRoomKey] = useState<string>('');
   // 聊天模式: 音频; 视频; 音视频
@@ -47,7 +52,7 @@ const Home: React.FC = () => {
   // 通讯录实例
   const contactRef = useRef<IContactRef>(null); // sidebar
   // 聊天窗口实例
-  const chatRef = useRef<IChatRef>(null); // main
+  const chatBoxRef = useRef<IChatBoxRef>(null); // main
 
   // 更新密码的弹窗挂载/卸载
   const handleMountPwdModal = (doMount: boolean) => setMountPwdModal(doMount);
@@ -57,16 +62,16 @@ const Home: React.FC = () => {
   const handleMountAudioModal = (doMount: boolean) => setMountAudioModal(doMount);
   // 视频聊天弹窗挂载/卸载
   const handleMountVideoModal = (doMount: boolean) => setMountVideoModal(doMount);
-  // 登出
-  const onBeforeLogout = async () => {
+  // 退出登录
+  const confirmLogout = async () => {
     try {
       const res = await logoutApi(userInfo);
       if (res.code !== BaseState.Success) {
-        toast.error('登出失败, 请重试');
+        toast.error('退出登录失败, 请重试');
         return;
       }
       userInfoStore.clearUserInfo();
-      toast.success('登出成功');
+      toast.success('退出登录成功');
       if (socket.current !== null) {
         // 关闭 websocket 连接
         socket.current.close();
@@ -74,7 +79,7 @@ const Home: React.FC = () => {
       }
     } catch (err) {
       console.error(err);
-      toast.error('登出失败, 请重试');
+      toast.error('退出登录失败, 请重试');
     }
   };
 
@@ -112,7 +117,7 @@ const Home: React.FC = () => {
           break;
         case 'msgList':
           // 刷新消息列表
-          chatRef.current?.refreshMsgList();
+          chatBoxRef.current?.refreshMsgList();
           break;
         case 'chatRoom':
           try {
@@ -131,14 +136,64 @@ const Home: React.FC = () => {
   };
   useEffect(() => setupSocket(), []); // onMounted
 
+  const handleClickIcon = (item: IconItem) => {
+    setCurIconKey(item.key);
+    switch (item.key) {
+      case 'MessageEmoji':
+        return navigate('/chat');
+      case 'AddressBook':
+        return navigate('/contact');
+      case 'Power':
+        return confirmLogout();
+    }
+  };
+
   const handleSelectItem = (item: IFriendItem | IGroupItem) => {
     // navigate('/chat')
     // setSelectedChat(item);
-  }
+  };
 
   return (
     <BgContainer>
-      <main>Homepage</main>
+      {/* 左侧 */}
+      <div>
+        <ul>
+          {IconList.slice(0, 5).map((item) => (
+            <li>
+              <Tooltip key={item.key} placement="bottomLeft" title={item.title} arrow={false}>
+                <item.IconInst
+                  onClick={() => handleClickIcon(item)}
+                  className={`${curIconKey === item.key ? 'text-ito5' : 'text-slate-500'}`}
+                />
+              </Tooltip>
+            </li>
+          ))}
+        </ul>
+
+        <ul>
+          {IconList.slice(5).map((item) => (
+            <li>
+              <Tooltip key={item.key} placement="bottomLeft" title={item.title} arrow={false}>
+                <item.IconInst
+                  onClick={() => handleClickIcon(item)}
+                  className={`${curIconKey === item.key ? 'text-ito5' : 'text-slate-500'}`}
+                />
+              </Tooltip>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {/* 右侧 */}
+      <div>
+        {(() => {
+          switch (curIconKey) {
+            case 'MessageEmoji':
+              return <ChatBox ref={chatBoxRef} />;
+            case 'AddressBook':
+              return <Contact ref={contactRef} />;
+          }
+        })()}
+      </div>
     </BgContainer>
   );
 };

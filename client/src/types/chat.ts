@@ -11,7 +11,7 @@ export interface ChatItem {
 
 export interface IFriendItem {
   // friends 表字段
-  id: number, // friends 表字段 id, 好友 ID
+  id: number; // friends 表字段 id, 好友 ID
   avatar: string; // friends 表字段 avatar, 好友头像
   email: string; // friends 表字段 email, 好友邮箱
   noteName: string; // friends 表字段 note_name, 好友备注
@@ -21,12 +21,12 @@ export interface IFriendItem {
   userId: number; // friends 表字段 user_id, 所属用户 ID
 
   // 补充属性
-  friendUserId: number,
-  groupId: number,
-  groupName: string,
-  roomKey: string,
-  username: string, // 好友的用户名
-  signature: string, // 好友的签名
+  friendUserId: number;
+  groupId: number;
+  groupName: string;
+  roomKey: string;
+  username: string; // 好友的用户名
+  signature: string; // 好友的签名
 }
 
 export interface IGroupItem {

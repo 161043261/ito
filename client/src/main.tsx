@@ -8,6 +8,7 @@ import App from './App';
 import '@/assets/styles/tailwind.css';
 //! global.scss
 import '@/assets/styles/global.scss';
+import '@ant-design/v5-patch-for-react-19';
 
 const container = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(container);

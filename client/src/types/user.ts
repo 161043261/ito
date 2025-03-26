@@ -1,6 +1,7 @@
-export interface IUserInfo { // users
+export interface IUserInfo {
+  // users
   // ! id, email, password, username, avatar, signature
-  id: number, // id
+  id: number; // id
   email: string; // email
   password: string; // password
   avatar: string; // avatar
