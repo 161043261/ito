@@ -5,7 +5,7 @@ import type { Request, Response } from "express";
 import { resErr, resOk } from "../utils/res.js";
 import { AuthState, BaseState } from "../utils/state.js";
 import query from "../utils/query.js";
-import { secretKey } from "../utils/auth.js";
+import { secretKey } from "../utils/user.js";
 
 const redis = new Redis({
   host: "127.0.0.1",
@@ -58,7 +58,7 @@ export async function login(req: Request, res: Response) {
     const userInfo = { email, password, username, avatar, signature };
     return resOk(res, { token, userInfo: { ...userInfo, id } });
   } catch (err) {
-    console.error("[service/auth] login:", err);
+    console.error("[service/user] login:", err);
     resErr(res, BaseState.ServerErr);
   }
 }
@@ -74,7 +74,7 @@ export async function logout(req: Request, res: Response) {
     await Promise.all([query(sql, ["offline", email]), redis.del(`token:${email}`)]);
     return resOk(res);
   } catch (err) {
-    console.error("[service/auth] logout:", err);
+    console.error("[service/user] logout:", err);
     return resErr(res, BaseState.ServerErr);
   }
 }
@@ -136,7 +136,7 @@ export async function register(req: Request, res: Response) {
     const data = { token, userInfo: { ...userInfo, id } };
     return resOk(res, data);
   } catch (err) {
-    console.error("[service/auth] register:", err);
+    console.error("[service/user] register:", err);
     return resErr(res, BaseState.ServerErr);
   }
 }

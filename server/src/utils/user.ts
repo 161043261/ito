@@ -23,7 +23,7 @@ export function auth(req: Request, res: Response, next: NextFunction) {
       return resJson(res, BaseState.TokenInvalid);
     } else {
       // todo
-      console.log("[utils/auth] decoded:", decoded);
+      console.log("[utils/user] decoded:", decoded);
       req.cookies.email = decoded;
       next();
     }

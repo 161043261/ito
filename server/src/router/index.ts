@@ -6,7 +6,7 @@ import express, {
 } from "express";
 import expressWs from "express-ws";
 import bodyParser from "body-parser";
-import createAuthRouter from "./auth.js";
+import createUserRouter from "./user.js";
 
 const app = express();
 expressWs(app);
@@ -50,7 +50,7 @@ const staticHandler: RequestHandler = (req, res, next) => {
 app.use("", corsHandler);
 app.use("/upload", staticHandler, express.static("upload"));
 
-const authRouter = createAuthRouter();
-app.use("/api/v1/auth", corsHandler, authRouter);
+const authRouter = createUserRouter();
+app.use("/api/v1/user", corsHandler, authRouter);
 
 export default app;

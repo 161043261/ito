@@ -42,6 +42,19 @@ const Home: React.FC = () => {
   const contactSidebar = useRef<IContactRef>(null);
   // 聊天窗口实例
   const chatMain = useRef<IChatRef>(null);
+
+  // 更新密码的弹窗挂载/卸载
+  const handleMountPwdModal = (doMount: boolean) => setMountPwdModal(doMount);
+  // 更新用户信息的弹窗挂载/卸载
+  const handleMountUserInfoModal = (doMount: boolean) => setMountUserInfoModal(doMount);
+  // 音频聊天弹窗挂载/卸载
+  const handleMountAudioModal = (doMount: boolean) => setMountAudioModal(doMount);
+  // 视频聊天弹窗挂载/卸载
+  const handleMountVideoModal = (doMount: boolean) => setMountVideoModal(doMount);
+  // 登出
+  const onBeforeLogout = async () => {
+
+  }
   return (
     <BgContainer>
       <main>Homepage</main>
