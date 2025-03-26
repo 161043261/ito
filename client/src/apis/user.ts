@@ -1,4 +1,4 @@
-import { ILoginReqData, ILoginResData, IRegisterReqData, IRegisterResData } from '@/types/user';
+import { ILoginReqData, ILoginResData, IRegisterReqData, IRegisterResData, IUserInfo } from '@/types/user';
 import request from '@/utils/request';
 
 export async function loginApi(reqData: ILoginReqData) {
@@ -11,4 +11,7 @@ export async function registerApi(reqData: IRegisterReqData) {
   return res.data;
 }
 
-export async function logoutApi() {}
+export async function logoutApi(reqData: IUserInfo) {
+  const res = await request.post<IUserInfo>('/user/logout', reqData)
+  return res.data;
+}

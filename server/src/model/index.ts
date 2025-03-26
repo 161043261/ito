@@ -2,7 +2,7 @@ import mysql from "mysql";
 import fs from "node:fs";
 import path from "node:path";
 
-// mysql:8.4
+//! mysql:8.4
 // docker logs --follow mysql_container
 // docker exec -it mysql_container bash
 // ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY 'pass';

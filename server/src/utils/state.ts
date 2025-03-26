@@ -8,8 +8,8 @@ export enum BaseState {
   UpdateFailed = 1005,
 }
 
-// 2xxx auth
-export enum AuthState {
+// 2xxx user
+export enum UserState {
   EmailOrPassErr = 2001,
   UserLoggedIn = 2002,
   UserRegistered = 2003,
@@ -43,7 +43,7 @@ export const Code2Msg = new Map<number, string>([
   [1004, "创建失败"],
   [1005, "更新失败"],
 
-  // 2xxx auth
+  // 2xxx user
   [2001, "邮箱或密码错误"],
   [2002, "用户已登录"],
   [2003, "用户已注册"],

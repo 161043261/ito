@@ -84,7 +84,7 @@ const Login: React.FC = () => {
       return navigate('/');
     }
 
-    toast.error('登录失败');
+    toast.error('登录失败, 请重试');
     setLoading(false);
   };
 

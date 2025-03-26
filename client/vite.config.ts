@@ -6,10 +6,6 @@ import path from 'node:path';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss() as PluginOption[]],
-  // server: {
-  //   open: true,
-  // },
-
   //! tsconfig.app.json
   // {
   //   "compilerOptions": {
@@ -23,16 +19,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    proxy: {
-      '^/api/v1': {
-        target: 'http://127.0.0.1:3000',
-        changeOrigin: true,
-        rewrite: (path) => {
-          console.log("[vite.config] path:", path);
-          return path.replace(/^\/api\/v/, '/api');
-        },
-      },
-    },
-  },
+  // server: {
+  //   proxy: {
+  //     '^/api/v': {
+  //       target: 'http://127.0.0.1:3000',
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/api\/v/, '/api'),
+  //     },
+  //   },
+  // },
 });

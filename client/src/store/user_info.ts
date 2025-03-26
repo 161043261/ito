@@ -20,15 +20,9 @@ export const createUserInfoStore: StateCreator<IUserInfoState> = (set) => {
     ...emptyUserInfo,
     ...JSON.parse(sessionStorage.getItem('userInfo') ?? '{}'),
   };
-  const { email, password, avatar, username, signature } = userInfo;
+  const { id, email, password, avatar, username, signature } = userInfo;
   return {
-    userInfo: {
-      email,
-      password,
-      avatar,
-      username,
-      signature,
-    },
+    userInfo: { id, email, password, avatar, username, signature },
     setUserInfo: (userInfo_: IUserInfo) => {
       set((state: IUserInfoState) => {
         const userInfo = { ...state, ...userInfo_ };

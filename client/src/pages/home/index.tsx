@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { logoutApi } from '@/apis/user';
 import useToast from '@/hooks/use_toast';
 import useUserInfoStore from '@/store/user_info';
 import { IChatRef, IContactRef } from '@/types/fc_expose';
 import { IReceiverInfo } from '@/types/user';
+import { BaseState } from '@/utils/constants';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
@@ -17,6 +19,7 @@ const Home: React.FC = () => {
   const toast = useToast();
   const navigate = useNavigate();
   const userInfoStore = useUserInfoStore();
+  const userInfo = userInfoStore.userInfo;
 
   // 更新密码的弹窗
   const [mountPwdModal, setMountPwdModal] = useState(false);
@@ -53,8 +56,24 @@ const Home: React.FC = () => {
   const handleMountVideoModal = (doMount: boolean) => setMountVideoModal(doMount);
   // 登出
   const onBeforeLogout = async () => {
-
-  }
+    try {
+      const res = await logoutApi(userInfo);
+      if (res.code !== BaseState.Success) {
+        toast.error('登出失败, 请重试');
+        return;
+      }
+      userInfoStore.clearUserInfo();
+      toast.success('登出成功');
+      if (socket.current !== null) {
+        // 关闭 websocket 连接
+        socket.current.close();
+        socket.current = null;
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('登出失败, 请重试');
+    }
+  };
   return (
     <BgContainer>
       <main>Homepage</main>

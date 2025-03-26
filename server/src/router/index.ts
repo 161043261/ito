@@ -50,7 +50,7 @@ const staticHandler: RequestHandler = (req, res, next) => {
 app.use("", corsHandler);
 app.use("/upload", staticHandler, express.static("upload"));
 
-const authRouter = createUserRouter();
-app.use("/api/v1/user", corsHandler, authRouter);
+const userRouter = createUserRouter();
+app.use("/api/v1/user", corsHandler, userRouter);
 
 export default app;

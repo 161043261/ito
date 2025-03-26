@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { Redis } from "ioredis";
 import type { Request, Response } from "express";
 import { resErr, resOk } from "../utils/res.js";
-import { AuthState, BaseState } from "../utils/state.js";
+import { UserState, BaseState } from "../utils/state.js";
 import query from "../utils/query.js";
 import { secretKey } from "../utils/user.js";
 
@@ -19,7 +19,7 @@ export async function login(req: Request, res: Response) {
     return resErr(res, BaseState.ParamErr);
   }
   if (cachedToken) {
-    return resErr(res, AuthState.UserLoggedIn);
+    return resErr(res, UserState.UserLoggedIn);
   }
 
   try {
@@ -28,7 +28,7 @@ export async function login(req: Request, res: Response) {
     const sql = `select * from users where email = ?`;
     const results = await query(sql, [email]);
     if (results.length === 0) {
-      return resErr(res, AuthState.EmailOrPassErr);
+      return resErr(res, UserState.EmailOrPassErr);
     }
 
     //! 解盐
@@ -39,7 +39,7 @@ export async function login(req: Request, res: Response) {
       .update(salt + password)
       .digest("hex");
     if (encodedPwd !== encodedPwd2) {
-      return resErr(res, AuthState.EmailOrPassErr);
+      return resErr(res, UserState.EmailOrPassErr);
     }
 
     //! 签发令牌
@@ -53,10 +53,8 @@ export async function login(req: Request, res: Response) {
       query(sql2, ["online", email]),
       redis.set(`token:${email}`, token, "EX", 60 * 60 * 24),
     ]);
-
-    //! email, password, username, avatar, signature
-    const userInfo = { email, password, username, avatar, signature };
-    return resOk(res, { token, userInfo: { ...userInfo, id } });
+    //! id, email, password, username, avatar, signature
+    return resOk(res, { token, userInfo: { id, email, password, username, avatar, signature } });
   } catch (err) {
     console.error("[service/user] login:", err);
     resErr(res, BaseState.ServerErr);
@@ -90,7 +88,7 @@ export async function register(req: Request, res: Response) {
     const sql = `select count(*) as count from users where email = ?`;
     const results = await query(sql, [email]);
     if (Number.parseInt(results[0].count) !== 0) {
-      return resErr(res, AuthState.UserRegistered);
+      return resErr(res, UserState.UserRegistered);
     }
 
     //! 加盐
@@ -104,13 +102,13 @@ export async function register(req: Request, res: Response) {
     //! const sql2 = `insert into users set ?`;
     //! const results2 = await query(sql2, userInfo);
     const sql2 = `insert into users set ?`;
-    //! email, password, username, avatar, signature
+    //! id, email, password, username, avatar, signature
     const userInfo = {
       email,
       password: saltedPwd,
       username: email, // 默认
       avatar,
-      signature: "谢谢你的关注",
+      signature: "", // 默认
     };
     const results2 = await query(sql2, userInfo);
     if (results2.affectedRows !== 1) {

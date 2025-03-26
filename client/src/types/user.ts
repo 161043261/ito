@@ -1,5 +1,6 @@
 export interface IUserInfo {
-  // ! email, password, username, avatar, signature
+  // ! id, email, password, username, avatar, signature
+  id: number,
   email: string;
   password: string;
   avatar: string;
@@ -26,7 +27,7 @@ export interface IRegisterReqData {
 export interface IRegisterResData {
   token: string;
   userInfo: {
-    //! email, password, username, avatar, signature
+    //! id, email, password, username, avatar, signature
     id: number;
     email: string;
     username: string;
