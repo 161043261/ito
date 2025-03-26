@@ -1,11 +1,18 @@
 export function genBase64Img(): string {
   const canvas = document.createElement('canvas');
-  canvas.width = 1;
-  canvas.height = 1;
+  canvas.width = 200;
+  canvas.height = 200;
   const ctx = canvas.getContext('2d')!;
-  const [r, g, b] = Array.from({ length: 3 }, () => Math.floor(Math.random() * 256));
-  ctx.fillStyle = `rgb(${r},${g},${b})`;
-  ctx.fillRect(0, 0, 1, 1);
-  const base64 = canvas.toDataURL('image/png');
-  return base64;
+  const randColor = () =>
+    '#' +
+    Math.floor(Math.random() * 0xffffff)
+      .toString(16)
+      .padStart(6, '0');
+  for (let i = 0; i < 4; i++) {
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    ctx.fillStyle = randColor();
+    ctx.fillRect(col * 100, row * 100, 100, 100);
+  }
+  return canvas.toDataURL('image/png');
 }
