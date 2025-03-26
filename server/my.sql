@@ -79,7 +79,7 @@ create table if not exists `groups`
   -- 群主的用户 ID
   owner_id   int(31)      not null,
   -- 房间号
-  room_num   varchar(255) not null unique,
+  room_key   varchar(255) not null unique,
   -- 群聊头像
   avatar     longtext,
   -- 群公告
@@ -129,7 +129,7 @@ create table if not exists messages
   -- 消息内容
   content     longtext                                not null,
   -- 房间号
-  room_num    varchar(255)                            not null,
+  room_key    varchar(255)                            not null,
   -- 消息类型
   type        enum ('private', 'public')              not null,
   -- 媒体类型
@@ -150,7 +150,7 @@ create table if not exists msg_stats
   -- 消息统计 ID
   id         int(31)      not null auto_increment,
   -- 房间号
-  room_num   varchar(255) not null,
+  room_key   varchar(255) not null,
   -- 消息总数
   total      int(255)     not null,
   created_at timestamp default current_timestamp,

@@ -1,11 +1,11 @@
-export interface IUserInfo {
+export interface IUserInfo { // users
   // ! id, email, password, username, avatar, signature
-  id: number,
-  email: string;
-  password: string;
-  avatar: string;
-  username: string;
-  signature?: string;
+  id: number, // id
+  email: string; // email
+  password: string; // password
+  avatar: string; // avatar
+  username: string; // username
+  signature?: string; // signature
 }
 
 export interface ILoginReqData {
