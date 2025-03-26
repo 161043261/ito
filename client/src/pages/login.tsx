@@ -14,7 +14,7 @@ import { IUserInfo, ILoginReqData } from '@/types/user';
 import styles from './login.module.scss';
 
 // styled-components
-const BgContainer = styled.div`
+const Background = styled.div`
   background: center no-repeat;
   background-size: cover;
   background-image: url(${bg});
@@ -124,7 +124,7 @@ const Login: React.FC = () => {
   );
 
   return (
-    <BgContainer>
+    <Background>
       <div
         className={`${styles.loginContainer} absolute top-[50%] left-[10%] w-100 translate-y-[-50%] px-7`}
       >
@@ -175,7 +175,7 @@ const Login: React.FC = () => {
           <></>
         )}
       </div>
-    </BgContainer>
+    </Background>
   );
 };
 

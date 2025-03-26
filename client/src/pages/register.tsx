@@ -12,7 +12,7 @@ import { Button, Form, Input } from 'antd';
 import { genBase64Img } from '@/utils/img';
 
 // styled-components
-const BgContainer = styled.div`
+const Background = styled.div`
   background: center no-repeat;
   background-size: cover;
   background-image: url(${bg});
@@ -57,7 +57,7 @@ export default function Register() {
   };
 
   return (
-    <BgContainer>
+    <Background>
       <div
         className={`${styles.registerContainer} absolute top-[50%] left-[10%] w-100 translate-y-[-50%] px-7`}
       >
@@ -102,6 +102,6 @@ export default function Register() {
           </Form.Item>
         </Form>
       </div>
-    </BgContainer>
+    </Background>
   );
 }

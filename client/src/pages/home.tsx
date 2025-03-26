@@ -155,34 +155,34 @@ const Home: React.FC = () => {
   };
 
   return (
-    <BgContainer>
+    <div className="flex h-dvh w-dvw">
       {/* 左侧 */}
-      <div>
-        <div>
-          <Popover placement="rightTop">
-            <Base64Img src={userInfo.avatar} className="h-25 w-25" />
-          </Popover>
-        </div>
-        <ul>
+      <div className="bg-theme2 flex flex-col items-center justify-between py-5">
+        <ul className="flex flex-col items-center gap-5">
+          <li>
+            <Popover placement="rightTop">
+              <Base64Img src={userInfo.avatar} className="h-25 w-25 cursor-pointer" />
+            </Popover>
+          </li>
           {IconList.slice(0, 5).map((item) => (
             <li key={item.key}>
-              <Tooltip placement="bottomLeft" title={item.title} arrow={false}>
+              <Tooltip placement="left" title={item.title} arrow={false}>
                 <item.IconInst
                   onClick={() => handleClickIcon(item)}
-                  className={`${curIconKey === item.key ? 'text-ito5' : 'text-slate-500'} text-7xl`}
+                  className={`${curIconKey === item.key ? 'text-theme5' : 'text-slate-500'} cursor-pointer text-5xl`}
                 />
               </Tooltip>
             </li>
           ))}
         </ul>
 
-        <ul>
+        <ul className="flex flex-col items-center gap-5">
           {IconList.slice(5).map((item) => (
             <li key={item.key}>
-              <Tooltip placement="bottomLeft" title={item.title} arrow={false}>
+              <Tooltip placement="left" title={item.title} arrow={false}>
                 <item.IconInst
                   onClick={() => handleClickIcon(item)}
-                  className={`${curIconKey === item.key ? 'text-ito5' : 'text-slate-500'} text-7xl`}
+                  className={`${curIconKey === item.key ? 'text-theme5' : 'text-slate-500'} cursor-pointer text-5xl`}
                 />
               </Tooltip>
             </li>
@@ -202,7 +202,7 @@ const Home: React.FC = () => {
           })() /** IIFE */
         }
       </div>
-    </BgContainer>
+    </div>
   );
 };
 
