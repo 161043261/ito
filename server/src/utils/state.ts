@@ -58,6 +58,6 @@ export const Code2Msg = new Map<number, string>([
   // 5xxx msg
 
   // 6xxx file
-  [6001, "文件已上传"],
-  [6002, "分块已上传, 等待合并"], // pending for merge
+  [6001, "文件重复上传"],
+  [6002, "分块全部上传, 等待合并"],
 ]);
