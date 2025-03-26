@@ -6,7 +6,7 @@ interface IProps {
   className?: string;
 }
 
-export default function ImageContainer(props: IProps) {
+export default function Base64Img(props: IProps) {
   const { src, alt, className } = props;
   return (
     <img

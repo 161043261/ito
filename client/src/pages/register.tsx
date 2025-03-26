@@ -2,7 +2,6 @@ import { registerApi } from '@/apis/user';
 import useToast from '@/hooks/use_toast';
 import { ILoginReqData } from '@/types/user';
 import { BaseState } from '@/utils/constants';
-import { genBase64Img } from '@/utils/img';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import styled from 'styled-components';
@@ -39,7 +38,7 @@ export default function Register() {
       const reqData = {
         email,
         password,
-        avatar: genBase64Img(),
+        avatar: '',
       };
       const res = await registerApi(reqData);
       setLoading(false);

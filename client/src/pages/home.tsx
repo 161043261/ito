@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { logoutApi } from '@/apis/user';
-import ImageContainer from '@/components/image_container';
+import Base64Img from '@/components/base64img';
 import useToast from '@/hooks/use_toast';
 import useUserInfoStore from '@/store/user_info';
 import { IFriendItem, IGroupItem } from '@/types/chat';
 import { IChatBoxRef, IContactRef } from '@/types/fc_expose';
 import { IReceiverInfo } from '@/types/user';
 import { BaseState } from '@/utils/constants';
-import { Button, Tooltip } from 'antd';
+import { Button, Popover, Tooltip } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { IconItem, IconKey, IconList } from '@/utils/icons';
@@ -72,6 +72,7 @@ const Home: React.FC = () => {
       }
       userInfoStore.clearUserInfo();
       toast.success('退出登录成功');
+      navigate('/login');
       if (socket.current !== null) {
         // 关闭 websocket 连接
         socket.current.close();
@@ -86,7 +87,7 @@ const Home: React.FC = () => {
   const UserInfoModal = (
     <div>
       <div className="flex">
-        <ImageContainer src={userInfo.avatar} />
+        <Base64Img src={userInfo.avatar} />
         <div>
           <div>{userInfo.username}</div>
           <div>{userInfo.signature ?? ''}</div>
@@ -157,13 +158,18 @@ const Home: React.FC = () => {
     <BgContainer>
       {/* 左侧 */}
       <div>
+        <div>
+          <Popover placement="rightTop">
+            <Base64Img src={userInfo.avatar} className="h-25 w-25" />
+          </Popover>
+        </div>
         <ul>
           {IconList.slice(0, 5).map((item) => (
-            <li>
-              <Tooltip key={item.key} placement="bottomLeft" title={item.title} arrow={false}>
+            <li key={item.key}>
+              <Tooltip placement="bottomLeft" title={item.title} arrow={false}>
                 <item.IconInst
                   onClick={() => handleClickIcon(item)}
-                  className={`${curIconKey === item.key ? 'text-ito5' : 'text-slate-500'}`}
+                  className={`${curIconKey === item.key ? 'text-ito5' : 'text-slate-500'} text-7xl`}
                 />
               </Tooltip>
             </li>
@@ -172,11 +178,11 @@ const Home: React.FC = () => {
 
         <ul>
           {IconList.slice(5).map((item) => (
-            <li>
-              <Tooltip key={item.key} placement="bottomLeft" title={item.title} arrow={false}>
+            <li key={item.key}>
+              <Tooltip placement="bottomLeft" title={item.title} arrow={false}>
                 <item.IconInst
                   onClick={() => handleClickIcon(item)}
-                  className={`${curIconKey === item.key ? 'text-ito5' : 'text-slate-500'}`}
+                  className={`${curIconKey === item.key ? 'text-ito5' : 'text-slate-500'} text-7xl`}
                 />
               </Tooltip>
             </li>
@@ -185,14 +191,16 @@ const Home: React.FC = () => {
       </div>
       {/* 右侧 */}
       <div>
-        {(() => {
-          switch (curIconKey) {
-            case 'MessageEmoji':
-              return <ChatBox ref={chatBoxRef} />;
-            case 'AddressBook':
-              return <Contact ref={contactRef} />;
-          }
-        })()}
+        {
+          (() => {
+            switch (curIconKey) {
+              case 'MessageEmoji':
+                return <ChatBox ref={chatBoxRef} />;
+              case 'AddressBook':
+                return <Contact ref={contactRef} />;
+            }
+          })() /** IIFE */
+        }
       </div>
     </BgContainer>
   );

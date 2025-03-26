@@ -4,7 +4,7 @@ import Login from '@/pages/login';
 import Register from '@/pages/register';
 
 export interface IRoute {
-  key?: string; // name
+  key: string; // name
   path: string; // relative path
   element: React.FC; // component
   children?: IRoute[];
@@ -13,9 +13,9 @@ export interface IRoute {
 
 export const routes: IRoute[] = [
   {
-    key: 'Home',
+    key: 'Home', // name
     path: '/',
-    element: withGuard(lazy(() => import('@/pages/home'))),
+    element: withGuard(lazy(() => import('@/pages/home'))), // component
     children: [
       {
         key: 'Chat',

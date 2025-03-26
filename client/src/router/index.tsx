@@ -16,7 +16,7 @@ const RouterPage = () => {
     return routes.map((route) => {
       return (
         <Route
-          key={route.key ?? route.path}
+          key={route.key}
           path={route.path}
           element={
             route.redirect ? (

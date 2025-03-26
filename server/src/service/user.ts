@@ -1,4 +1,5 @@
 import crypto, { randomUUID } from "node:crypto";
+import { promises as fs } from "node:fs";
 import jwt from "jsonwebtoken";
 import { Redis } from "ioredis";
 import type { Request, Response } from "express";
@@ -6,6 +7,12 @@ import { resErr, resOk } from "../utils/res.js";
 import { UserState, BaseState } from "../utils/state.js";
 import query from "../utils/query.js";
 import { secretKey } from "../utils/user.js";
+import path from "node:path";
+
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const redis = new Redis({
   host: "127.0.0.1",
@@ -14,13 +21,13 @@ const redis = new Redis({
 
 export async function login(req: Request, res: Response) {
   const { email, password } = req.body;
-  const cachedToken = await redis.get(`token:${email}`);
+  // const cachedToken = await redis.get(`token:${email}`);
   if (!email || !password) {
     return resErr(res, BaseState.ParamErr);
   }
-  if (cachedToken) {
-    return resErr(res, UserState.UserLoggedIn);
-  }
+  // if (cachedToken) {
+  //   return resErr(res, UserState.UserLoggedIn);
+  // }
 
   try {
     //! const sql = `select * from users where email = ?`;
@@ -78,9 +85,13 @@ export async function logout(req: Request, res: Response) {
 }
 
 export async function register(req: Request, res: Response) {
-  const { email, password, avatar } = req.body;
-  if (!email || !password || !avatar) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     return resErr(res, BaseState.ParamErr);
+  }
+  let avatar = req.body.avatar;
+  if (!avatar) {
+    avatar = await fs.readFile(path.join(__dirname, "../../avatar.txt"), { encoding: "utf-8" });
   }
   try {
     //! const sql = `select count(*) as count from users where email = ?`;
