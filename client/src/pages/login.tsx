@@ -72,6 +72,7 @@ const Login: React.FC = () => {
     setLoading(true);
     const reqData = { email, password };
     const res = await loginApi(reqData);
+    console.log(res);
     if (res.code === BaseState.Success && res.data) {
       toast.success('登录成功');
       setLoading(false);

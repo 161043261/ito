@@ -1,7 +1,8 @@
 import { IUserInfo } from '@/types/user';
 import { create, StateCreator } from 'zustand';
 
-const emptyUserInfo = {
+const emptyUserInfo: IUserInfo = {
+  id: 0,
   email: '',
   password: '',
   avatar: '',
@@ -20,19 +21,22 @@ export const createUserInfoStore: StateCreator<IUserInfoState> = (set) => {
     ...emptyUserInfo,
     ...JSON.parse(sessionStorage.getItem('userInfo') ?? '{}'),
   };
-  const { id, email, password, avatar, username, signature } = userInfo;
   return {
-    userInfo: { id, email, password, avatar, username, signature },
+    userInfo,
     setUserInfo: (userInfo_: IUserInfo) => {
       set((state: IUserInfoState) => {
-        const userInfo = { ...state, ...userInfo_ };
-        sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
-        return userInfo;
+        console.log(state, userInfo_);
+        // state.userInfo = { ...state.userInfo, ...userInfo_ };
+        sessionStorage.setItem('userInfo', JSON.stringify(state.userInfo));
+        return { userInfo: { ...state.userInfo, ...userInfo_ } };
       });
     },
     clearUserInfo: () => {
       sessionStorage.clear();
-      return { ...emptyUserInfo };
+      set((/** state: IUserInfoState */) => {
+        // state.userInfo = emptyUserInfo;
+        return { userInfo: emptyUserInfo };
+      });
     },
   };
 };

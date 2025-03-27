@@ -8,14 +8,14 @@ export function resJson(res, code, data) {
   };
   body.code = code ?? 200;
   body.data = data ?? "";
-  body.msg = Code2Msg.get(code ?? 200) ?? "success";
+  body.msg = Code2Msg.get(body.code) ?? "成功";
   res.json(body);
 }
 
 export function resErr(res, code) {
-  resJson(res, code /** code */, "" /** data */);
+  resJson(res, code ?? 400 /** code */, "" /** data */);
 }
 
-export function resOk(res, data, code) {
-  resJson(res, code ?? 200 /** code */, data ?? "" /** data */);
+export function resOk(res, data) {
+  resJson(res, 200 /** code */, data ?? "" /** data */);
 }

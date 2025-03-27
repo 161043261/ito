@@ -10,8 +10,11 @@ export default function Base64Img(props: IProps) {
   const { src, alt, className } = props;
   return (
     <img
-      src={src.length ? src : genBase64Img()}
-      onError={(ev) => (ev.currentTarget.src = genBase64Img())}
+      src={src}
+      onError={(ev) => {
+        console.error('avatar error');
+        ev.currentTarget.src = genBase64Img();
+      }}
       alt={alt ?? 'img'}
       className={className}
       draggable={false}

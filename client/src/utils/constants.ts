@@ -1,6 +1,8 @@
 // 1xxx base
 export enum BaseState {
   Success = 200,
+  Failed = 400,
+
   ServerErr = 1001,
   TokenInvalid = 1002, // error or expired
   ParamErr = 1003,
@@ -35,6 +37,7 @@ export enum FileState {
 
 export const Code2Msg = new Map<number, string>([
   [200, '成功'],
+  [400, '失败'],
 
   // 1xxx base
   [1001, '服务器错误'],

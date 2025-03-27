@@ -1,6 +1,7 @@
 .PHONY: push degit
 
 push:
+	cd ./client && pnpm format && cd ../server && pnpm format
 	git add -A
 	git commit -m "chore: Regular code maintenance"
 	git push origin main

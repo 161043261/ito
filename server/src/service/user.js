@@ -17,6 +17,11 @@ const redis = new Redis({
   port: 6379,
 });
 
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
 export async function login(req, res) {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -54,19 +59,19 @@ export async function login(req, res) {
     ]);
     //! id, email, password, username, avatar, signature
     const userInfo = { id, email, password, username, avatar, signature };
-
-    ///////////////////////////////////
-    req.cookies["userInfo"] = userInfo;
     res.cookie("userInfo", userInfo);
-    ///////////////////////////////////
-
-    return resOk(res, { token });
+    return resOk(res, { token, userInfo });
   } catch (err) {
     console.error("[service/user] login:", err);
     resErr(res, BaseState.ServerErr);
   }
 }
 
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
 export async function logout(req, res) {
   const { email } = req.body;
   if (!email) {
@@ -85,8 +90,14 @@ export async function logout(req, res) {
   }
 }
 
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
 export async function register(req, res) {
   const { email, password, avatar } = req.body;
+  console.log(req.body);
   if (!email || !password || !avatar) {
     return resErr(res, BaseState.ParamErr);
   }
@@ -129,5 +140,53 @@ export async function register(req, res) {
   } catch (err) {
     console.error("[service/user] register:", err);
     return resErr(res, BaseState.ServerErr);
+  }
+}
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+export async function updatePwd(req, res) {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return resErr(res, BaseState.ParamErr);
+  }
+  try {
+    const results = await query("select email, password from users where email = ?", [email]);
+    if (results.length === 0) {
+      return resErr(res, UserState.UserNotRegistered);
+    }
+    const salt = results[0].password.split("$")[0];
+    const encodedPwd = crypto
+      .createHash("md5")
+      .update(salt + password)
+      .digest("hex");
+    const saltedPwd = salt + "$" + encodedPwd;
+    const { affectedRows } = await query("update users set password = ? where email = ?", [
+      saltedPwd,
+      email,
+    ]);
+    if (affectedRows === 1) {
+      return resOk(res);
+    } else {
+      return resErr(res);
+    }
+  } catch (err) {
+    console.error(err);
+    resErr(res, BaseState.ServerErr);
+  }
+}
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+export async function updateUserInfo(req, res) {
+  const { email, avatar, username, signature } = req.body;
+  if (!email) {
+    return resErr(res, BaseState.ParamErr);
   }
 }

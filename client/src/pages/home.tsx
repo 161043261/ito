@@ -75,7 +75,7 @@ const Home: React.FC = () => {
   //! @/components/video_modal.tsx
   const handleMountVideoModal = (doMount: boolean) => setMountVideoModal(doMount);
   // 退出登录
-  const confirmLogout = async () => {
+  const logout = async () => {
     try {
       const res = await logoutApi(userInfo);
       if (res.code !== BaseState.Success) {
@@ -160,7 +160,7 @@ const Home: React.FC = () => {
       case 'AddressBook':
         return navigate('/contact');
       case 'Power':
-        return confirmLogout();
+        return logout();
     }
   };
 
