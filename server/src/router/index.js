@@ -14,16 +14,17 @@ app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 app.use(cookieParser());
 
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
 const staticHandler = (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "*");
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Methods", "*");
   res.header("Content-Type", "application/octet-stream");
   // 预检 (pre-flight) 请求
   if (req.method.toLowerCase() === "options") {
     res.sendStatus(200);
-    // res.end();
   } else {
     next();
   }

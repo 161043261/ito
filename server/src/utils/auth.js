@@ -6,6 +6,12 @@ import { BaseState } from "./state.js";
 // secretKey.length === 32
 export const secretKey = crypto.randomBytes(16).toString("hex");
 
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
 export function auth(req, res, next) {
   const token = req.headers.authorization;
   if (!token) {
