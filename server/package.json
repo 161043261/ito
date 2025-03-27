@@ -6,7 +6,8 @@
   "scripts": {
     "start": "tsc && node ./dist/index.js",
     "lint": "eslint --fix --max-warnings=0",
-    "format": "prettier --write ./src"
+    "format": "prettier --write ./src",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -41,7 +42,8 @@
     "lint-staged": "^15.5.0",
     "prettier": "^3.5.3",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.27.0"
+    "typescript-eslint": "^8.27.0",
+    "vitest": "^3.0.9"
   },
   "type": "module"
 }

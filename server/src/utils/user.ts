@@ -1,8 +1,7 @@
-import {
-  type NextFunction,
-  type Request,
-  // type RequestHandler,
-  type Response,
+import type {
+  NextFunction,
+  Request,
+  Response,
 } from "express";
 import jwt from "jsonwebtoken";
 import crypto from "node:crypto";
@@ -24,7 +23,6 @@ export function auth(req: Request, res: Response, next: NextFunction) {
     } else {
       // todo
       console.log("[utils/user] decoded:", decoded);
-      req.cookies.email = decoded;
       next();
     }
   });

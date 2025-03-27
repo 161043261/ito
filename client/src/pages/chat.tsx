@@ -5,17 +5,17 @@ interface IProps {
 }
 
 export interface IChatBoxRef {
-  refreshMsgList: () => void; // 刷新消息列表
+  fetchMsgList: () => void; // 刷新消息列表
 }
 
 const ChatBox: React.FC<IProps> = ({ ref }: IProps /** props */) => {
-  const refreshMsgList = () => {
-    console.log('refreshMsgList');
+  const fetchMsgList = () => {
+    console.log('fetchMsgList');
   };
   useImperativeHandle(ref, () => {
-    return { refreshMsgList };
+    return { fetchMsgList };
   });
-  return <div>ChatBox</div>;
+  return <div>Chat Page</div>;
 };
 
 export default ChatBox;

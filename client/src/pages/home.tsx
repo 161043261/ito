@@ -3,22 +3,26 @@ import { logoutApi } from '@/apis/user';
 import Base64Img from '@/components/base64img';
 import useToast from '@/hooks/use_toast';
 import useUserInfoStore from '@/store/user_info';
-import { IFriendItem, IGroupItem } from '@/types/chat';
-import { IChatBoxRef, IContactRef } from '@/types/fc_expose';
-import { IReceiverInfo } from '@/types/user';
+
+import type { IChatBoxRef, IContactRef } from '@/types/fc_expose';
+import type { IReceiverInfo } from '@/types/user';
 import { BaseState } from '@/utils/constants';
+
 import { Button, Popover, Tooltip } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { IconItem, IconKey, IconList } from '@/utils/icons';
 
-import styled from 'styled-components';
 import ChatBox from './chat';
 import Contact from './contact';
 import PwdModal from '@/components/pwd_modal';
 import UserInfoModal from '@/components/user_info_modal';
 import AudioModal from '@/components/audio_modal';
 import VideoModal from '@/components/video_modal';
+
+import styled from 'styled-components';
+import type { IGroupInfo, IGroupItem } from '@/types/group';
+import type { IFriendInfo, IFriendItem } from '@/types/friend';
 
 const BgContainer = styled.div`
   width: 100vw;
@@ -31,7 +35,7 @@ const Home: React.FC = () => {
   const userInfoStore = useUserInfoStore();
   const userInfo = userInfoStore.userInfo;
 
-  // 选中的图标
+  // 当前选中的图标
   const [curIconKey, setCurIconKey] = useState<IconKey>('MessageEmoji');
   // 更新密码的弹窗
   const [mountPwdModal, setMountPwdModal] = useState(false);
@@ -41,7 +45,7 @@ const Home: React.FC = () => {
   const [mountAudioModal, setMountAudioModal] = useState(false);
   // 视频聊天弹窗
   const [mountVideoModal, setMountVideoModal] = useState(false);
-  // 选中的单聊或群聊
+  // 当前选中的单聊或群聊
   const [curChat, setCurChat] = useState<IFriendItem | IGroupItem | null>(null);
   // 房间号
   const [roomKey, setRoomKey] = useState<string>('');
@@ -121,15 +125,15 @@ const Home: React.FC = () => {
       switch (msg.type) {
         case 'friendList':
           // 刷新好友列表
-          contactRef.current?.refreshFriendList();
+          contactRef.current?.fetchFriendList();
           break;
         case 'groupList':
           // 刷新群聊列表
-          contactRef.current?.refreshGroupList();
+          contactRef.current?.fetchGroupList();
           break;
         case 'msgList':
           // 刷新消息列表
-          chatBoxRef.current?.refreshMsgList();
+          chatBoxRef.current?.fetchMsgList();
           break;
         case 'chatRoom':
           try {
@@ -160,9 +164,9 @@ const Home: React.FC = () => {
     }
   };
 
-  const handleSelectItem = (item: IFriendItem | IGroupItem) => {
-    // navigate('/chat')
-    // setSelectedChat(item);
+  const handleSelectChat = (chatInfo: IFriendInfo | IGroupInfo) => {
+    navigate('/chat');
+    setCurChat(chatInfo);
   };
 
   return (
@@ -211,7 +215,7 @@ const Home: React.FC = () => {
                 case 'MessageEmoji':
                   return <ChatBox ref={chatBoxRef} />;
                 case 'AddressBook':
-                  return <Contact ref={contactRef} />;
+                  return <Contact ref={contactRef} handleSelectChat={handleSelectChat} />;
               }
             })() /** IIFE */
           }

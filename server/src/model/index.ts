@@ -44,7 +44,7 @@ create table if not exists users
   username   varchar(255) null,
   -- 用户头像
   avatar     longtext     null,
-  -- 用户签名
+  -- 签名
   signature  longtext     null,
   created_at datetime  default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp

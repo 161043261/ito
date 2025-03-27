@@ -14,7 +14,7 @@ create table if not exists users
   username   varchar(255) null,
   -- 用户头像
   avatar     longtext     null,
-  -- 用户签名
+  -- 签名
   signature  longtext     null, 
   created_at datetime  default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp
@@ -95,7 +95,6 @@ create table if not exists `groups`
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
-
 
 -- 群聊成员表
 create table if not exists group_members

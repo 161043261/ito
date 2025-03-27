@@ -21,19 +21,16 @@ const redis = new Redis({
 
 export async function login(req: Request, res: Response) {
   const { email, password } = req.body;
-  // const cachedToken = await redis.get(`token:${email}`);
   if (!email || !password) {
     return resErr(res, BaseState.ParamErr);
   }
+  // const cachedToken = await redis.get(`token:${email}`);
   // if (cachedToken) {
   //   return resErr(res, UserState.UserLoggedIn);
   // }
 
   try {
-    //! const sql = `select * from users where email = ?`;
-    //! const results = await query(sql, [email]);
-    const sql = `select * from users where email = ?`;
-    const results = await query(sql, [email]);
+    const results = await query("select * from users where email = ?", [email]);
     if (results.length === 0) {
       return resErr(res, UserState.EmailOrPassErr);
     }
@@ -53,15 +50,19 @@ export async function login(req: Request, res: Response) {
     const payload = { id, email };
     const token = jwt.sign(payload, secretKey);
 
-    //! const sql2 = `update friends set state = ? where email = ?`;
-    //! query(sql2, ["online", email])
-    const sql2 = `update friends set state = ? where email = ?`;
     await Promise.all([
-      query(sql2, ["online", email]),
+      query('update friends set state = ? where email = ?', ["online", email]),
       redis.set(`token:${email}`, token, "EX", 60 * 60 * 24),
     ]);
     //! id, email, password, username, avatar, signature
-    return resOk(res, { token, userInfo: { id, email, password, username, avatar, signature } });
+    const userInfo = { id, email, password, username, avatar, signature };
+
+    ///////////////////////////////////
+    req.cookies["userInfo"] = userInfo;
+    res.cookie("userInfo", userInfo);
+    ///////////////////////////////////
+
+    return resOk(res, { token });
   } catch (err) {
     console.error("[service/user] login:", err);
     resErr(res, BaseState.ServerErr);
@@ -75,8 +76,10 @@ export async function logout(req: Request, res: Response) {
   }
 
   try {
-    const sql = `update friends set state = ? where email = ?`;
-    await Promise.all([query(sql, ["offline", email]), redis.del(`token:${email}`)]);
+    await Promise.all([
+      query("update friends set state = ? where email = ?", ["offline", email]),
+      redis.del(`token:${email}`),
+    ]);
     return resOk(res);
   } catch (err) {
     console.error("[service/user] logout:", err);
@@ -94,10 +97,7 @@ export async function register(req: Request, res: Response) {
     avatar = await fs.readFile(path.join(__dirname, "../../avatar.txt"), { encoding: "utf-8" });
   }
   try {
-    //! const sql = `select count(*) as count from users where email = ?`;
-    //! const results = await query(sql, [email]);
-    const sql = `select count(*) as count from users where email = ?`;
-    const results = await query(sql, [email]);
+    const results = await query("select count(*) as count from users where email = ?", [email]);
     if (Number.parseInt(results[0].count) !== 0) {
       return resErr(res, UserState.UserRegistered);
     }
@@ -110,10 +110,6 @@ export async function register(req: Request, res: Response) {
       .digest("hex");
     const saltedPwd = salt + "$" + encodedPwd;
 
-    //! const sql2 = `insert into users set ?`;
-    //! const results2 = await query(sql2, userInfo);
-    const sql2 = `insert into users set ?`;
-    //! id, email, password, username, avatar, signature
     const userInfo = {
       email,
       password: saltedPwd,
@@ -121,23 +117,15 @@ export async function register(req: Request, res: Response) {
       avatar,
       signature: "", // 默认
     };
-    const results2 = await query(sql2, userInfo);
+    const results2 = await query('insert into users set ?', userInfo);
     if (results2.affectedRows !== 1) {
       return resErr(res, BaseState.ServerErr);
     }
-
-    //! const sql3 = `select * from users where email = ?`;
-    //! const results3 = await query(sql3, [email]);
-    const sql3 = `select * from users where email = ?`;
-    const results3 = await query(sql3, [email]);
-
-    //! const sql4 = `insert into tags set ?`;
-    //! await query(sql4, [tag]);
-    const sql4 = `insert into tags set ?`;
+    const results3 = await query('select * from users where email = ?', [email]);
     const { id } = results3[0];
     // 默认标签
     const tag = { user_id: id, user_email: email, name: "好友" };
-    await query(sql4, [tag]);
+    await query('insert into tags set ?', [tag]);
 
     //! 签发令牌
     const payload = { id, email };

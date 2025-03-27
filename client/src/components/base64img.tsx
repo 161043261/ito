@@ -10,7 +10,7 @@ export default function Base64Img(props: IProps) {
   const { src, alt, className } = props;
   return (
     <img
-      src={src}
+      src={src.length ? src : genBase64Img()}
       onError={(ev) => (ev.currentTarget.src = genBase64Img())}
       alt={alt ?? 'img'}
       className={className}
