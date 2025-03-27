@@ -1,4 +1,4 @@
-export function fmtBytes(bytes: number, fractionDigits: number) {
+export function fmtBytes(bytes, fractionDigits) {
   if (bytes === 0) {
     return "0B";
   }
@@ -8,7 +8,7 @@ export function fmtBytes(bytes: number, fractionDigits: number) {
   return Number.parseFloat((bytes / Math.pow(1024, i)).toFixed(fractionDigits)) + sizes[i];
 }
 
-export function fmtDate(date: number | Date) {
+export function fmtDate(date) {
   if (typeof date === "number") {
     date = new Date(date);
   }

@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Code2Msg } from "./state.js";
-import type { Response } from "express";
 
-export function resJson(res: Response, code?: number, data?: any) {
+export function resJson(res, code, data) {
   const body = {
     code: 200,
     data: "",
@@ -14,10 +12,10 @@ export function resJson(res: Response, code?: number, data?: any) {
   res.json(body);
 }
 
-export function resErr(res: Response, code: number) {
+export function resErr(res, code) {
   resJson(res, code /** code */, "" /** data */);
 }
 
-export function resOk(res: Response, data?: any, code?: number) {
+export function resOk(res, data, code) {
   resJson(res, code ?? 200 /** code */, data ?? "" /** data */);
 }

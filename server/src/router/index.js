@@ -1,9 +1,4 @@
-import express, {
-  type Request,
-  type Response,
-  type NextFunction,
-  type RequestHandler,
-} from "express";
+import express from "express";
 import expressWs from "express-ws";
 import bodyParser from "body-parser";
 import createUserRouter from "./user.js";
@@ -16,7 +11,7 @@ expressWs(app);
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
-function corsHandler(req: Request, res: Response, next: NextFunction) {
+function corsHandler(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
   res.header("Access-Control-Allow-Credentials", "true");
@@ -31,7 +26,7 @@ function corsHandler(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-const staticHandler: RequestHandler = (req, res, next) => {
+const staticHandler = (req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
   res.header("Access-Control-Allow-Credentials", "true");

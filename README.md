@@ -3,18 +3,93 @@
 <img src="./assets/ito.png" alt="ito" width="416" />
 
 ```txt
-+------------+ +------------+ +---------------+ +------------+ +-------------+ +------------+ +------------+
-| users      | | friends    | | group_members | | groups     | | messages    | | msg_stats  | | tags       |
-+------------+ +------------+ +---------------+ +------------+ +-------------+ +------------+ +------------+
-| avatar     | | avatar     | | created_at    | | avatar     | | content     | | created_at | | created_at |
-| created_at | | created_at | | group_id      | | created_at | | created_at  | | id         | | id         |
-| email      | | email      | | id            | | id         | | file_size   | | room_key   | | name       |
-| id         | | id         | | nickname      | | name       | | id          | | total      | | updated_at |
-| password   | | note_name  | | updated_at    | | note_name  | | media_type  | | updated_at | | user_email |
-| signature  | | state      | | user_id       | | owner_id   | | receiver_id | +------------+ | user_id    |
-| updated_at | | tag_id     | +---------------+ | readme     | | room_key    |                +------------+
-| username   | | unread_cnt |                   | room_key   | | sender_id   |
-+------------+ | updated_at |                   | unread_cnt | | state       |
-               | user_id    |                   | updated_at | | type        |
-               +------------+                   +------------+ +-------------+
++------------+      
+| users      |      
++------------+      
+| avatar     |      
+| created_at |      
+| email      |      
+| id         |      
+| password   |      
+| signature  |      
+| updated_at |      
+| username   |    
++------------+    
+
++------------+
+| friends    |
++------------+
+| avatar     |
+| created_at |
+| email      |
+| id         |
+| note_name  |
+| state      |
+| tag_id     |
+| unread_cnt |
+| updated_at |
+| user_id    |
++------------+
+
++---------------+
+| group_members |
++---------------+
+| created_at    |
+| group_id      |
+| id            |
+| nickname      |
+| updated_at    |
+| user_id       |
++---------------+
+
++------------+
+| groups     |
++------------+
+| avatar     |
+| created_at |
+| id         |
+| name       |
+| note_name  |
+| owner_id   |
+| readme     |
+| room_key   |
+| unread_cnt |
+| updated_at |
++------------+
+
++-------------+
+| messages    |
++-------------+
+| content     |
+| created_at  |
+| file_size   |
+| id          |
+| media_type  |
+| receiver_id |
+| room_key    |
+| sender_id   |
+| state       |
+| type        |
++-------------+
+
++------------+
+| msg_stats  |
++------------+
+| created_at |
+| id         |
+| room_key   |
+| total      |
+| updated_at |
++------------+
+
++------------+
+| tags       |
++------------+
+| created_at |
+| id         |
+| name       |
+| updated_at |
+| user_email |
+| user_id    |
++------------+
 ```

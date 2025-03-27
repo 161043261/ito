@@ -1,25 +1,23 @@
 import crypto, { randomUUID } from "node:crypto";
-import { promises as fs } from "node:fs";
+// import { promises as fs } from "node:fs";
 import jwt from "jsonwebtoken";
 import { Redis } from "ioredis";
-import type { Request, Response } from "express";
 import { resErr, resOk } from "../utils/res.js";
 import { UserState, BaseState } from "../utils/state.js";
 import query from "../utils/query.js";
 import { secretKey } from "../utils/user.js";
-import path from "node:path";
 
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// import { fileURLToPath } from "url";
+// import { dirname } from "node:path";
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
 
 const redis = new Redis({
   host: "127.0.0.1",
   port: 6379,
 });
 
-export async function login(req: Request, res: Response) {
+export async function login(req, res) {
   const { email, password } = req.body;
   if (!email || !password) {
     return resErr(res, BaseState.ParamErr);
@@ -69,7 +67,7 @@ export async function login(req: Request, res: Response) {
   }
 }
 
-export async function logout(req: Request, res: Response) {
+export async function logout(req, res) {
   const { email } = req.body;
   if (!email) {
     return resErr(res, BaseState.ParamErr);
@@ -87,14 +85,10 @@ export async function logout(req: Request, res: Response) {
   }
 }
 
-export async function register(req: Request, res: Response) {
-  const { email, password } = req.body;
-  if (!email || !password) {
+export async function register(req, res) {
+  const { email, password, avatar } = req.body;
+  if (!email || !password || !avatar) {
     return resErr(res, BaseState.ParamErr);
-  }
-  let avatar = req.body.avatar;
-  if (!avatar) {
-    avatar = await fs.readFile(path.join(__dirname, "../../avatar.txt"), { encoding: "utf-8" });
   }
   try {
     const results = await query("select count(*) as count from users where email = ?", [email]);

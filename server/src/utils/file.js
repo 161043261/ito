@@ -1,4 +1,4 @@
-export function getFileType(filename: string) {
+export function getFileType(filename) {
   const extname = filename.split(".").at(-1)?.toLowerCase();
   switch (extname) {
     case "avi":

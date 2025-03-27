@@ -1,7 +1,6 @@
 import pool from "../model/index.js";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function query(sql: string, values: any): Promise<any> {
+export default function query(sql, values) {
   return new Promise((resolve, reject) => {
     pool.query(
       {

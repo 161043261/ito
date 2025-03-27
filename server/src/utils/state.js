@@ -1,39 +1,40 @@
 // 1xxx base
-export enum BaseState {
-  Success = 200,
-  ServerErr = 1001,
-  TokenInvalid = 1002, // error or expired
-  ParamErr = 1003,
-  CreateFailed = 1004,
-  UpdateFailed = 1005,
-}
+export const BaseState = {
+  Success: 200,
+  ServerErr: 1001,
+  TokenInvalid: 1002, // error or expired
+  ParamErr: 1003,
+  CreateFailed: 1004,
+  UpdateFailed: 1005,
+};
 
 // 2xxx user
-export enum UserState {
-  EmailOrPassErr = 2001,
-  UserLoggedIn = 2002,
-  UserRegistered = 2003,
-  UserNotRegistered = 2004,
-}
+export const UserState = {
+  EmailOrPassErr: 2001,
+  UserLoggedIn: 2002,
+  UserRegistered: 2003,
+  UserNotRegistered: 2004,
+};
 
 // 3xxx friend
-export enum FriendState {}
+// export const FriendState = {}
 
 // 4xxx group
-export enum GroupState {
-  YouHasJoined = 4001,
-  FriendHasJoined = 4002,
-}
+export const GroupState = {
+  YouHasJoined: 4001,
+  FriendHasJoined: 4002,
+};
 
 // 5xxx msg
+// export const MsgState = {}
 
 // 6xxx file
-export enum FileState {
-  FileUploaded = 6001,
-  ChunksUploaded = 6002, // pending for merge
-}
+export const FileState = {
+  FileUploaded: 6001,
+  ChunksUploaded: 6002, // pending for merge
+};
 
-export const Code2Msg = new Map<number, string>([
+export const Code2Msg = new Map([
   [200, "成功"],
 
   // 1xxx base

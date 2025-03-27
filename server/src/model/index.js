@@ -1,6 +1,36 @@
--- https://github.com/161043161/ito
-use db0;
+import mysql from "mysql";
+import fs from "node:fs";
+import path from "node:path";
 
+//! mysql:8.4
+// docker logs --follow mysql_container
+// docker exec -it mysql_container bash
+// ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY 'pass';
+// flush privileges;
+// create database db0;
+let conf = {
+  host: "localhost",
+  port: 3306,
+  user: "root",
+  password: "pass",
+  database: "db0",
+};
+const confPath = path.join(process.cwd(), "./conf.json");
+if (fs.existsSync(confPath)) {
+  const conf2 = JSON.parse(fs.readFileSync(confPath, { encoding: "utf-8" }));
+  conf = { ...conf, ...conf2 };
+} else {
+  console.warn("[model/db] conf.json not found");
+}
+
+const pool = mysql.createPool({
+  ...conf,
+  multipleStatements: true,
+  charset: "utf8mb4",
+});
+
+function createUsers() {
+  const sql = `
 -- 用户表
 create table if not exists users
 (
@@ -15,14 +45,22 @@ create table if not exists users
   -- 用户头像
   avatar     longtext     null,
   -- 签名
-  signature  longtext     null, 
+  signature  longtext     null,
   created_at datetime  default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
+`;
+  pool.query(sql, (err) => {
+    if (err) {
+      console.error("[model/db]", err);
+    }
+  });
+}
 
-
+function createFriends() {
+  const sql = `
 -- 好友表
 create table if not exists friends
 (
@@ -42,6 +80,8 @@ create table if not exists friends
   state      enum ('online', 'offline') default 'offline',
   -- 未读消息数
   unread_cnt int(31)                    default 0,
+  -- 房间号
+  room_key   varchar(255),
   created_at timestamp                  default current_timestamp,
   updated_at timestamp                  default current_timestamp on update current_timestamp,
   index idx_tag_id (tag_id),
@@ -49,7 +89,16 @@ create table if not exists friends
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
+`;
+  pool.query(sql, (err) => {
+    if (err) {
+      console.error("[model/db]", err);
+    }
+  });
+}
 
+function createTags() {
+  const sql = `
 -- 标签表
 create table if not exists tags
 (
@@ -68,9 +117,20 @@ create table if not exists tags
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
+`;
+  pool.query(sql, (err) => {
+    if (err) {
+      console.error("[model/db]", err);
+    }
+    createFriends();
+    createGroups();
+  });
+}
 
+function createGroups() {
+  const sql = `
 -- 群聊表
-create table if not exists `groups`
+create table if not exists \`groups\`
 (
   -- 群聊 ID
   id         int(31)      not null auto_increment primary key,
@@ -95,7 +155,17 @@ create table if not exists `groups`
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
+`;
+  pool.query(sql, (err) => {
+    if (err) {
+      console.error("[model/db]", err);
+    }
+    createGroupMembers();
+  });
+}
 
+function createGroupMembers() {
+  const sql = `
 -- 群聊成员表
 create table if not exists group_members
 (
@@ -111,11 +181,20 @@ create table if not exists group_members
   updated_at timestamp default current_timestamp on update current_timestamp,
   index idx_group_id (group_id),
   index idx_user_id (user_id),
-  foreign key (group_id) references `groups` (id) on delete cascade
+  foreign key (group_id) references \`groups\` (id) on delete cascade
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
+`;
+  pool.query(sql, (err) => {
+    if (err) {
+      console.error("[model/db]", err);
+    }
+  });
+}
 
+function createMessages() {
+  const sql = `
 -- 消息表
 create table if not exists messages
 (
@@ -142,7 +221,17 @@ create table if not exists messages
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
+`;
+  pool.query(sql, (err) => {
+    if (err) {
+      console.error("[model/db]", err);
+    }
+    createMsgStats();
+  });
+}
 
+function createMsgStats() {
+  const sql = `
 -- 消息统计表
 create table if not exists msg_stats
 (
@@ -158,3 +247,22 @@ create table if not exists msg_stats
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
+`;
+  pool.query(sql, (err) => {
+    if (err) {
+      console.error("[model/db]", err);
+    }
+  });
+}
+
+pool.query("select 1", (err) => {
+  if (err) {
+    console.error("[model/db]", err);
+    process.exit(1);
+  }
+  createUsers();
+  createTags();
+  createMessages();
+});
+
+export default pool;
