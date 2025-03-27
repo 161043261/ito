@@ -15,6 +15,10 @@ import { IconItem, IconKey, IconList } from '@/utils/icons';
 import styled from 'styled-components';
 import ChatBox from './chat';
 import Contact from './contact';
+import PwdModal from '@/components/pwd_modal';
+import UserInfoModal from '@/components/user_info_modal';
+import AudioModal from '@/components/audio_modal';
+import VideoModal from '@/components/video_modal';
 
 const BgContainer = styled.div`
   width: 100vw;
@@ -55,12 +59,16 @@ const Home: React.FC = () => {
   const chatBoxRef = useRef<IChatBoxRef>(null); // main
 
   // 更新密码的弹窗挂载/卸载
+  //! @/components/pwd_modal.tsx
   const handleMountPwdModal = (doMount: boolean) => setMountPwdModal(doMount);
   // 更新用户信息的弹窗挂载/卸载
+  //! @/components/user_info_modal.tsx
   const handleMountUserInfoModal = (doMount: boolean) => setMountUserInfoModal(doMount);
   // 音频聊天弹窗挂载/卸载
+  //! @/components/audio_modal.tsx
   const handleMountAudioModal = (doMount: boolean) => setMountAudioModal(doMount);
   // 视频聊天弹窗挂载/卸载
+  //! @/components/video_modal.tsx
   const handleMountVideoModal = (doMount: boolean) => setMountVideoModal(doMount);
   // 退出登录
   const confirmLogout = async () => {
@@ -84,23 +92,26 @@ const Home: React.FC = () => {
     }
   };
 
-  const UserInfoModal = (
+  const UserInfoContent = (
     <div>
-      <div className="flex">
-        <Base64Img src={userInfo.avatar} />
-        <div>
-          <div>{userInfo.username}</div>
-          <div>{userInfo.signature ?? ''}</div>
+      <div className="flex h-30 w-100 gap-5">
+        <Base64Img src={userInfo.avatar} className="h-30 w-30" />
+        <div className="flex h-30 w-65 flex-col justify-between">
+          <div className="flex flex-col gap-3">
+            <div>{userInfo.username}</div>
+            <div className="truncate">
+              {userInfo.signature?.length ? userInfo.signature : '这个人很神秘, 什么都没有写'}
+            </div>
+          </div>
+          <div className="flex justify-between">
+            <Button onClick={() => handleMountPwdModal(true)}>修改密码</Button>
+            <Button onClick={() => handleMountUserInfoModal(true)}>修改用户信息</Button>
+          </div>
         </div>
-      </div>
-      <div>
-        <Button onClick={() => handleMountPwdModal(true)}>修改密码</Button>
-        <Button onClick={() => handleMountUserInfoModal(true)}>修改用户信息</Button>
       </div>
     </div>
   );
 
-  // 主页挂载时,
   const setupSocket = () => {
     const ws = new WebSocket(
       `${import.meta.env.VITE_WS_BASE_URL}/user/chan?email=${userInfo.email}`,
@@ -155,53 +166,61 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="flex h-dvh w-dvw">
-      {/* 左侧 */}
-      <div className="bg-theme2 flex flex-col items-center justify-between py-5">
-        <ul className="flex flex-col items-center gap-5">
-          <li>
-            <Popover placement="rightTop">
-              <Base64Img src={userInfo.avatar} className="h-25 w-25 cursor-pointer" />
-            </Popover>
-          </li>
-          {IconList.slice(0, 5).map((item) => (
-            <li key={item.key}>
-              <Tooltip placement="left" title={item.title} arrow={false}>
-                <item.IconInst
-                  onClick={() => handleClickIcon(item)}
-                  className={`${curIconKey === item.key ? 'text-theme5' : 'text-slate-500'} cursor-pointer text-5xl`}
-                />
-              </Tooltip>
+    <div>
+      <div className="flex h-dvh w-dvw">
+        {/* 左侧 */}
+        <div className="bg-theme2 flex flex-col items-center justify-between py-5">
+          <ul className="flex flex-col items-center gap-5">
+            <li>
+              <Popover content={UserInfoContent} placement="right">
+                <div>
+                  <Base64Img src={userInfo.avatar} className="h-25 w-25 cursor-pointer" />
+                </div>
+              </Popover>
             </li>
-          ))}
-        </ul>
+            {IconList.slice(0, 5).map((item) => (
+              <li key={item.key}>
+                <Tooltip placement="right" title={item.title} arrow={false}>
+                  <item.IconInst
+                    onClick={() => handleClickIcon(item)}
+                    className={`${curIconKey === item.key ? 'text-theme5' : 'text-slate-500'} cursor-pointer text-5xl`}
+                  />
+                </Tooltip>
+              </li>
+            ))}
+          </ul>
 
-        <ul className="flex flex-col items-center gap-5">
-          {IconList.slice(5).map((item) => (
-            <li key={item.key}>
-              <Tooltip placement="left" title={item.title} arrow={false}>
-                <item.IconInst
-                  onClick={() => handleClickIcon(item)}
-                  className={`${curIconKey === item.key ? 'text-theme5' : 'text-slate-500'} cursor-pointer text-5xl`}
-                />
-              </Tooltip>
-            </li>
-          ))}
-        </ul>
+          <ul className="flex flex-col items-center gap-5">
+            {IconList.slice(5).map((item) => (
+              <li key={item.key}>
+                <Tooltip placement="right" title={item.title} arrow={false}>
+                  <item.IconInst
+                    onClick={() => handleClickIcon(item)}
+                    className={`${curIconKey === item.key ? 'text-theme5' : 'text-slate-500'} cursor-pointer text-5xl`}
+                  />
+                </Tooltip>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {/* 右侧 */}
+        <div>
+          {
+            (() => {
+              switch (curIconKey) {
+                case 'MessageEmoji':
+                  return <ChatBox ref={chatBoxRef} />;
+                case 'AddressBook':
+                  return <Contact ref={contactRef} />;
+              }
+            })() /** IIFE */
+          }
+        </div>
       </div>
-      {/* 右侧 */}
-      <div>
-        {
-          (() => {
-            switch (curIconKey) {
-              case 'MessageEmoji':
-                return <ChatBox ref={chatBoxRef} />;
-              case 'AddressBook':
-                return <Contact ref={contactRef} />;
-            }
-          })() /** IIFE */
-        }
-      </div>
+      {mountPwdModal && <PwdModal />}
+      {mountUserInfoModal && <UserInfoModal />}
+      {mountAudioModal && <AudioModal />}
+      {mountVideoModal && <VideoModal />}
     </div>
   );
 };
