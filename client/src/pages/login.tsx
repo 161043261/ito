@@ -48,9 +48,9 @@ const Login: React.FC = () => {
 
   async function readLocal() {
     const userInfoStr = localStorage.getItem('userInfo');
-    const token_ = localStorage.getItem('');
+    const token_ = localStorage.getItem('token');
     if (!userInfoStr || !token_) {
-      return null;
+      return;
     }
     const userInfo: IUserInfo = JSON.parse(await decrypt(userInfoStr));
     const token = await decrypt(token_);
@@ -72,7 +72,6 @@ const Login: React.FC = () => {
     setLoading(true);
     const reqData = { email, password };
     const res = await loginApi(reqData);
-    console.log(res);
     if (res.code === BaseState.Success && res.data) {
       toast.success('登录成功');
       setLoading(false);

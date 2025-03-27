@@ -25,10 +25,9 @@ export const createUserInfoStore: StateCreator<IUserInfoState> = (set) => {
     userInfo,
     setUserInfo: (userInfo_: IUserInfo) => {
       set((state: IUserInfoState) => {
-        console.log(state, userInfo_);
-        // state.userInfo = { ...state.userInfo, ...userInfo_ };
-        sessionStorage.setItem('userInfo', JSON.stringify(state.userInfo));
-        return { userInfo: { ...state.userInfo, ...userInfo_ } };
+        const newUserInfo = { ...state.userInfo, ...userInfo_ };
+        sessionStorage.setItem('userInfo', JSON.stringify(newUserInfo));
+        return { userInfo: newUserInfo };
       });
     },
     clearUserInfo: () => {

@@ -6,6 +6,7 @@ import { resErr, resOk } from "../utils/res.js";
 import { UserState, BaseState } from "../utils/state.js";
 import query from "../utils/query.js";
 import { secretKey } from "../utils/auth.js";
+import { pub } from "../utils/pub.js";
 
 // import { fileURLToPath } from "url";
 // import { dirname } from "node:path";
@@ -97,7 +98,6 @@ export async function logout(req, res) {
  */
 export async function register(req, res) {
   const { email, password, avatar } = req.body;
-  console.log(req.body);
   if (!email || !password || !avatar) {
     return resErr(res, BaseState.ParamErr);
   }
@@ -171,7 +171,7 @@ export async function updatePwd(req, res) {
     if (affectedRows === 1) {
       return resOk(res);
     } else {
-      return resErr(res);
+      return resErr(res, BaseState.UpdateFailed);
     }
   } catch (err) {
     console.error(err);
@@ -189,4 +189,44 @@ export async function updateUserInfo(req, res) {
   if (!email) {
     return resErr(res, BaseState.ParamErr);
   }
+  try {
+    const userInfo = { avatar, username, signature };
+    const { affectedRows } = await query("update users set ? where email = ?", [userInfo, email]);
+    if (affectedRows !== 1) {
+      return resErr(res, BaseState.UpdateFailed);
+    }
+    const results = await query("select * from users where email = ?", [email]);
+    const { id, email } = results[0];
+    const payload = { id, email };
+    const token = jwt.sign(payload, secretKey);
+    await redis.set(`token:${email}`, token, "EX", 60 * 60 * 24);
+    return resOk(res, { ...userInfo, ...payload });
+  } catch (err) {
+    console.error(err);
+    return resErr(err, BaseState.ServerErr);
+  }
+}
+
+export async function startPub(ws, req) {
+  const url = req.url.split("?")[1];
+  const params = new URLSearchParams(url);
+  const curEmail = params.get("email");
+  global.chatRooms[curEmail] = {
+    ws,
+    state: false, // 用户是否在音视频通话
+  };
+  for (const email in global.chatRooms) {
+    if (email === curEmail) {
+      continue;
+    }
+    pub({ receiverEmail: email, type: "wsFriendList" });
+  }
+  ws.on("close", () => {
+    if (global.chatRooms[curEmail]) {
+      delete global.chatRooms[curEmail];
+      for (const email in global.chatRooms) {
+        pub({ receiverEmail: email, type: "wsFriendList" });
+      }
+    }
+  });
 }
