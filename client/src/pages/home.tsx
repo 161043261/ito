@@ -123,19 +123,19 @@ const Home: React.FC = () => {
     ws.onmessage = (ev) => {
       const msg = JSON.parse(ev.data);
       switch (msg.type) {
-        case 'friendList':
+        case 'wsFriendList':
           // 刷新好友列表
           contactRef.current?.fetchFriendList();
           break;
-        case 'groupList':
+        case 'wsGroupList':
           // 刷新群聊列表
           contactRef.current?.fetchGroupList();
           break;
-        case 'msgList':
+        case 'wsMsgList':
           // 刷新消息列表
           chatBoxRef.current?.fetchMsgList();
           break;
-        case 'chatRoom':
+        case 'wsChatRooms':
           try {
             const { receiverList, roomKey, mode } = msg;
             setReceiverList(receiverList);

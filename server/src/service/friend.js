@@ -2,8 +2,9 @@ import query from "../utils/query.js";
 import { BaseState } from "../utils/state.js";
 import { resErr, resOk } from "../utils/res.js";
 import { v4 as uuidv4 } from "uuid";
+import { pub } from "../utils/pub.js";
 
-export async function selectFriendsByTagId(tagId) {
+async function selectFriendsByTagId(tagId) {
   try {
     return await query("select id from friends where tag_id = ?", [tagId]);
   } catch (err) {
@@ -12,7 +13,7 @@ export async function selectFriendsByTagId(tagId) {
   }
 }
 
-export async function selectFriendsByUserId(userId) {
+async function selectFriendsByUserId(userId) {
   const friends = [];
   try {
     const results = await query("select id from tags where user_id = ?", [userId]);
@@ -27,10 +28,10 @@ export async function selectFriendsByUserId(userId) {
   }
 }
 
-export async function insertFriend(friendItem) {
+async function insertFriend(friendItem) {
   try {
-    const results = await query("insert into friends set ?", friendItem);
-    if (results.affectedRows !== 1) {
+    const { affectedRows } = await query("insert into friends set ?", friendItem);
+    if (affectedRows !== 1) {
       throw "affectedRows !==  1";
     }
   } catch (err) {
@@ -39,7 +40,12 @@ export async function insertFriend(friendItem) {
   }
 }
 
-export async function findUsers(req, res) {
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+export async function searchUsers(req, res) {
   const sender = req.cookies["userInfo"];
   console.log("[service/friend] sender:", sender);
   const { email } = req.query;
@@ -70,8 +76,14 @@ export async function findUsers(req, res) {
   }
 }
 
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
 export async function addFriend(req, res) {
   const sender = req.cookies["userInfo"];
+  // 好友 ID, 好友邮箱, 好友头像
   const { id, email, avatar } = req.body;
   if (!id || !email || !avatar) {
     return resErr(res, BaseState.ParamErr);
@@ -79,16 +91,166 @@ export async function addFriend(req, res) {
   try {
     const uuid = uuidv4();
     const senderTags = await query("select id from tags where user_id = ?", [sender.id]);
-    const friendItem = {
-      user_id: id, // 所属用户 ID
+    const senderFriendItem = {
+      // todo
+      user_id: sender.id, // 所属用户 ID
       email, // 好友邮箱
       avatar, // 好友头像
       state: global.chatRooms.has(email) ? "online" : "offline", // 好友状态
       note_name: email, // 好友备注
       tag_id: senderTags[0].id, // 好友的标签 ID
-      room_key: uuid, //
+      room_key: uuid, // 房间号
     };
-    await insertFriend(friendItem);
+
+    const receiverTags = await query(`select id from tags where user_id = ?`, [id]);
+    const receiverFriendItem = {
+      user_id: id,
+      email: sender.email,
+      avatar: sender.avatar,
+      state: global.chatRooms[sender.email] ? "online" : "offline",
+      note_name: sender.email,
+      tag_id: receiverTags[0].id,
+      room_key: uuid,
+    };
+
+    await Promise.all([insertFriend(senderFriendItem), insertFriend(receiverFriendItem)]);
+    pub({ receiverEmail: email, type: "wsFriendList" });
+    pub({ receiverEmail: sender.email, type: "wsFriendList" });
+    return resOk(res);
+  } catch (err) {
+    console.error(err);
+    return resErr(res, BaseState.ServerErr);
+  }
+}
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @description Fetch tagged friends list
+ */
+export async function fetchFriendList(req, res) {
+  try {
+    const sender = req.cookies["userInfo"];
+    const results = await query("select id, name from tags where user_id = ?", [sender.id]);
+    if (results.length === 0) {
+      return resOk(res, []);
+    }
+    const taggedFriendsList = [];
+    for (const result of results) {
+      const taggedFriends = { tagName: result.name, onlineCnt: 0, friends: [] };
+      const friends = await selectFriendsByTagId(result.id);
+      for (const friend of friends) {
+        taggedFriends.friends.push(friend);
+        if (friend.state === "online") {
+          taggedFriends.onlineCnt++;
+        }
+      }
+      taggedFriendsList.push(taggedFriends);
+    }
+    return resOk(res, taggedFriendsList);
+  } catch (err) {
+    console.error(err);
+    return resErr(res, BaseState.ServerErr);
+  }
+}
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+export async function findFriendByUserId(req, res) {
+  const { id } = req.query;
+  if (!id) {
+    return resErr(res, BaseState.ParamErr);
+  }
+  try {
+    const sql = `
+select f.id      as friend_id,
+       f.user_id as friend_user_id,
+       f.state,
+       f.tag_id,
+       f.room_key,
+       f.unread_cnt,
+       t.name    as tag_name,
+       u.email,
+       u.avatar,
+       u.username,
+       u.signature
+from friends as f
+       join users as u on f.user_id = u.id
+       join tags as t on f.tag_id = t.id
+where f.id = ?;
+    `;
+    const results = await query(sql, [id]);
+    if (results.length !== 0) {
+      return resOk(res, results[0]);
+    }
+  } catch (err) {
+    console.error(err);
+    return resErr(res, BaseState.ServerErr);
+  }
+}
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+export async function fetchTagList(req, res) {
+  const userId = req.userInfo.id;
+  if (!userId) {
+    return resErr(res, BaseState.ParamErr);
+  }
+  try {
+    const results = await query("select * from tags where user_id = ?", [userId]);
+    return resOk(res, results);
+  } catch (err) {
+    console.error(err);
+    return resErr(res, BaseState.ServerErr);
+  }
+}
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+export async function addTag(req, res) {
+  const tag = req.body;
+  if (!tag) {
+    return resErr(res, BaseState.ParamErr);
+  }
+  try {
+    const { affectedRows } = await query("insert into tags set ?", tag);
+    if (affectedRows === 1) {
+      return resOk(res);
+    }
+  } catch (err) {
+    console.error(err);
+    return resErr(res, BaseState.ServerErr);
+  }
+}
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+export async function updateFriend(req, res) {
+  const { friend_id, note_name, tag_id } = req.body;
+  if (!friend_id || !note_name || !tag_id) {
+    return resErr(res, BaseState.ParamErr);
+  }
+  try {
+    const { affectedRows } = await query(
+      "update friends set note_name = ?, tag_id = ? where id = ?",
+      [note_name, tag_id, friend_id],
+    );
+    if (affectedRows === 1) {
+      return resOk(res);
+    }
   } catch (err) {
     console.error(err);
     return resErr(res, BaseState.ServerErr);

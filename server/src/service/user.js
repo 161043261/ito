@@ -5,7 +5,7 @@ import { Redis } from "ioredis";
 import { resErr, resOk } from "../utils/res.js";
 import { UserState, BaseState } from "../utils/state.js";
 import query from "../utils/query.js";
-import { secretKey } from "../utils/user.js";
+import { secretKey } from "../utils/auth.js";
 
 // import { fileURLToPath } from "url";
 // import { dirname } from "node:path";
@@ -111,12 +111,12 @@ export async function register(req, res) {
       avatar,
       signature: "", // 默认
     };
-    const results2 = await query("insert into users set ?", userInfo);
-    if (results2.affectedRows !== 1) {
+    const { affectedRows } = await query("insert into users set ?", userInfo);
+    if (affectedRows !== 1) {
       return resErr(res, BaseState.ServerErr);
     }
-    const results3 = await query("select * from users where email = ?", [email]);
-    const { id } = results3[0];
+    // 数组解构赋值, 对象解构赋值
+    const [{ id }] = await query("select * from users where email = ?", [email]);
     // 默认标签
     const tag = { user_id: id, user_email: email, name: "好友" };
     await query("insert into tags set ?", [tag]);

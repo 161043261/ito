@@ -1,5 +1,5 @@
 // 某标签下的全部好友
-export interface ITagFriends {
+export interface ITaggedFriends {
   tagName: string;
   onlineCnt: number;
   friends: IFriendItem[];

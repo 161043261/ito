@@ -3,7 +3,7 @@ import ContactHeader from '@/components/contact_header';
 import useToast from '@/hooks/use_toast';
 import useUserInfoStore from '@/store/user_info';
 import { TabType } from '@/types/chat';
-import type { IFriendInfo, IFriendItem, ITagFriends } from '@/types/friend';
+import type { IFriendInfo, IFriendItem, ITaggedFriends } from '@/types/friend';
 import type { IGroupInfo } from '@/types/group';
 import type { ITagItem } from '@/types/tag';
 import { Form } from 'antd';
@@ -34,7 +34,7 @@ const Contact: React.FC<IProps> = ({ ref }: IProps /** props */) => {
   // 当前标签页类型: 单聊或群聊
   const [curTab, setCurTab] = useState<string>(TabType.P2p);
   // 好友列表
-  const [friendList, setFriendList] = useState<ITagFriends /** 某标签下的全部好友 */[]>([]);
+  const [friendList, setFriendList] = useState<ITaggedFriends /** 某标签下的全部好友 */[]>([]);
   // 当前选中的好友信息
   const [curFriendInfo, setCurFriendInfo] = useState<IFriendInfo>();
   // 标签列表
