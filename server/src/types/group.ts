@@ -10,8 +10,8 @@ export interface IGroupItem {
 
 export interface IGroupMemberItem {
   // group_members 表字段
-  id: number, // group_members 表字段 id, 成员 ID
-  group_id: number, // group_members 表字段 group_id, 群聊 ID
-  nickname: string, // group_members 表字段 nickname, 成员昵称
-  user_id: number // group_members 表字段 user_id, 成员的用户 ID
+  id: number; // group_members 表字段 id, 成员 ID
+  group_id: number; // group_members 表字段 group_id, 群聊 ID
+  nickname: string; // group_members 表字段 nickname, 成员昵称
+  user_id: number; // group_members 表字段 user_id, 成员的用户 ID
 }

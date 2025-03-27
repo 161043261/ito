@@ -1,8 +1,4 @@
-import type {
-  NextFunction,
-  Request,
-  Response,
-} from "express";
+import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import crypto from "node:crypto";
 import { resJson } from "./res.js";

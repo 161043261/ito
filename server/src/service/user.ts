@@ -51,7 +51,7 @@ export async function login(req: Request, res: Response) {
     const token = jwt.sign(payload, secretKey);
 
     await Promise.all([
-      query('update friends set state = ? where email = ?', ["online", email]),
+      query("update friends set state = ? where email = ?", ["online", email]),
       redis.set(`token:${email}`, token, "EX", 60 * 60 * 24),
     ]);
     //! id, email, password, username, avatar, signature
@@ -117,15 +117,15 @@ export async function register(req: Request, res: Response) {
       avatar,
       signature: "", // 默认
     };
-    const results2 = await query('insert into users set ?', userInfo);
+    const results2 = await query("insert into users set ?", userInfo);
     if (results2.affectedRows !== 1) {
       return resErr(res, BaseState.ServerErr);
     }
-    const results3 = await query('select * from users where email = ?', [email]);
+    const results3 = await query("select * from users where email = ?", [email]);
     const { id } = results3[0];
     // 默认标签
     const tag = { user_id: id, user_email: email, name: "好友" };
-    await query('insert into tags set ?', [tag]);
+    await query("insert into tags set ?", [tag]);
 
     //! 签发令牌
     const payload = { id, email };

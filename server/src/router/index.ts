@@ -16,7 +16,7 @@ expressWs(app);
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
-function corsHandler(req: Request, res:Response, next: NextFunction) {
+function corsHandler(req: Request, res: Response, next: NextFunction) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
   res.header("Access-Control-Allow-Credentials", "true");

@@ -2,6 +2,4 @@ import express from "express";
 const router = express.Router();
 
 // todo
-export default function createFriendRouter() {
-
-}
+export default function createFriendRouter() {}
