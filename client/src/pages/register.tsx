@@ -9,7 +9,7 @@ import bg from '@/assets/images/bg.jpg';
 
 import styles from './register.module.scss';
 import { Button, Form, Input } from 'antd';
-import { genBase64Img } from '@/utils/img';
+import { genBase64 } from '@/utils/img';
 
 // styled-components
 const Background = styled.div`
@@ -39,7 +39,7 @@ export default function Register() {
       const reqData = {
         email,
         password,
-        avatar: genBase64Img(),
+        avatar: genBase64(),
       };
       const res = await registerApi(reqData);
       setLoading(false);

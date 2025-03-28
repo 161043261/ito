@@ -19,3 +19,11 @@ export interface IGroupInfo extends IGroupItem {
   // 补充字段
   ownerEmail: string; // 群主的邮箱
 }
+
+export interface IGroupDto {
+  avatar: string;
+  id: number;
+  name: string;
+  memberNum: number;
+  flag: boolean;
+}

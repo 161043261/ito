@@ -120,28 +120,29 @@ from ((select group_id from group_members where user_id = 1) as gm)
  * @description Find group list by group name
  */
 export async function findGroupListByName(req, res) {
-  const { groupName } = req.query;
-  if (!groupName) {
+  const { name } = req.query;
+  if (!name) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
-    const results = await query("select * from `groups` where name like ?", [`%${groupName}%`]);
+    const results = await query("select * from `groups` where name like ?", [`%${name}%`]);
     const retList = [];
     if (results.length === 0) {
       return resOk(res, []);
     }
-    const { id } = req.userInfo;
+    const { id: userId } = req.userInfo;
     for (const group of results) {
       const members = await query("select user_id from group_members where group_id = ?", [
         group.id,
       ]);
+      //! name, avatar, memberNum, flag, id
       retList.push({
         name: group.name,
         avatar: group.avatar,
-        number: members.length,
+        memberNum: members.length,
         // 是否已加入
-        state: members.some((item) => item.user_id === id),
-        groupId: group.id,
+        flag: members.some((item) => item.user_id === userId),
+        id: group.id,
       });
     }
     return resOk(res, retList);

@@ -1,12 +1,12 @@
 import useToast from '@/hooks/use_toast';
-import { IFriendInfo, IFriendItem } from '@/types/friend';
-import { IGroupItem } from '@/types/group';
-import { ChangeEvent, useState } from 'react';
+import { IGroupDto } from '@/types/group';
+import { useState } from 'react';
 import { Button, Empty, Input, Modal, Tabs, TabsProps } from 'antd';
-import { addFriendApi, fetchFriendListApi, fetchFriendListByNameApi } from '@/apis/friend';
+import { addFriendApi, addSelf2GroupApi, fetchFriendListByNameApi } from '@/apis/friend';
 import { BaseState } from '@/utils/constants';
 import { Search } from '@icon-park/react';
-import Base64Img from './base64img';
+import ImgBox from './base64img';
+import { fetchGroupListByNameApi } from '@/apis/group';
 
 interface IProps {
   mountModal: boolean;
@@ -25,11 +25,10 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
       username: string;
     }[]
   >([]);
-  // todo: specify the generic
-  const [groupList, setGroupList] = useState<Partial<IGroupItem[]>>([]);
+  const [groupList, setGroupList] = useState<IGroupDto[]>([]);
   const [friendName, setFriendName] = useState('');
   const [groupName, setGroupName] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const handleFriendNameChange = (ev: { target: { value: string } }) => {
     setFriendName(ev.target.value);
@@ -38,7 +37,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
     }
   };
 
-  const handleFetchFriendListByName = async (username: string) => {
+  const fetchFriendListByName = async (username: string) => {
     try {
       if (username === '') {
         setFriendList([]);
@@ -84,12 +83,43 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
     }
   };
 
-  const handleFetchGroupListByName = async (groupName: string) => {
-    console.log(groupName);
+  const fetchGroupListByName = async (groupName: string) => {
+    try {
+      if (groupName === '') {
+        setGroupList([]);
+        return;
+      }
+      const res = await fetchGroupListByNameApi(groupName);
+      if (res.code === BaseState.Success && res.data) {
+        setGroupList(res.data);
+      } else {
+        toast.error('查询失败, 请重试');
+        setGroupList([]);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('查询失败, 请重试');
+      setGroupList([]);
+    }
   };
 
   const addSelf2group = async (groupId: number) => {
-    console.log(groupId);
+    setLoading(true);
+    try {
+      const res = await addSelf2GroupApi({ groupId });
+      if (res.code === BaseState.Success) {
+        toast.success('加入群聊成功');
+        setLoading(false);
+        setMountModal(false);
+      } else {
+        toast.error('加入群聊失败, 请重试');
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('加入群聊失败, 请重试');
+      setLoading(false);
+    }
   };
 
   const items: TabsProps['items'] = [
@@ -104,7 +134,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
               prefix={<Search theme="outline" size="24" fill="#333" />}
               onChange={(ev) => handleFriendNameChange(ev)}
             />
-            <Button type="primary" onClick={() => handleFetchFriendListByName(friendName)}>
+            <Button type="primary" onClick={() => fetchFriendListByName(friendName)}>
               查找
             </Button>
           </div>
@@ -113,9 +143,8 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
           ) : (
             <div className="mt-3 flex flex-col gap-y-3">
               {friendList.map((item) => (
-                // items-center: align-items: center;
                 <div key={item.id} className="grid grid-cols-4 items-center">
-                  <Base64Img src={item.avatar} className="h-20 rounded-full" />
+                  <ImgBox src={item.avatar} className="h-20 rounded-full" />
                   <div className="col-span-2 truncate">
                     <div>邮箱 {item.email}</div>
                     <div>用户名 {item.username}</div>
@@ -126,6 +155,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
                     <Button
                       className="justify-self-center"
                       onClick={() => addFriend2group(item.id, item.email, item.avatar)}
+                      loading={isLoading}
                     >
                       加好友
                     </Button>
@@ -141,10 +171,43 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
       key: 'addGroup',
       label: '加群',
       children: (
-        <div className="mt-3 flex flex-col gap-y-3">
-          {groupList.map((item) => (
-            <div key={item?.id}></div>
-          ))}
+        <div>
+          <div className="flex items-center justify-between gap-5">
+            <Input
+              placeholder="请输入群聊名"
+              prefix={<Search theme="outline" size="24" fill="#333" />}
+              onChange={handleGroupNameChange}
+            />
+            <Button type="primary" onClick={() => fetchGroupListByName(groupName)}>
+              查找
+            </Button>
+          </div>
+          {groupList.length === 0 ? (
+            <Empty />
+          ) : (
+            <div className="mt-3 flex flex-col gap-y-3">
+              {groupList.map((item) => (
+                <div key={item.id} className="grid grid-cols-4 items-center">
+                  <ImgBox src={item.avatar} className="h-20 rounded-full" />
+                  <div className="col-span-2 truncate">
+                    <div>群聊名 {item.name}</div>
+                    <div>群聊人数 {item.memberNum} </div>
+                  </div>
+                  {item.flag ? (
+                    <div className="justify-self-center">已经在群聊中了</div>
+                  ) : (
+                    <Button
+                      className="justify-self-center"
+                      onClick={() => addSelf2group(item.id)}
+                      loading={isLoading}
+                    >
+                      加入群聊
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ),
     },

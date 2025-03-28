@@ -1,11 +1,4 @@
-import {
-  FriendList,
-  IAddFriendDto,
-  IFriendInfo,
-  IFriendItem,
-  ITagItem,
-  IUpdateFriendDto,
-} from '@/types/friend';
+import { FriendList, IAddFriendDto, IFriendInfo, ITagItem, IUpdateFriendDto } from '@/types/friend';
 import request from '@/utils/request';
 
 export async function fetchFriendListByNameApi(username: string) {
@@ -28,7 +21,7 @@ export async function fetchFriendListApi() {
  * @param friendUserId Friend's user ID
  * @returns Find friend by friend's user ID
  */
-export async function findFriendByIdApi(friendUserId: number) {
+export async function fetchFriendByIdApi(friendUserId: number) {
   const res = await request.get<IFriendInfo>(`friend/id?id=${friendUserId}`);
   return res.data;
 }
@@ -45,5 +38,10 @@ export async function addTagApi(tagDto: Omit<ITagItem, 'id'>) {
 
 export async function updateFriendApi(friendDto: IUpdateFriendDto) {
   const res = await request.post<IUpdateFriendDto>('friend/update', friendDto);
+  return res.data;
+}
+
+export async function addSelf2GroupApi(data: { groupId: number }) {
+  const res = await request.post<{ groupId: number }>('/group/add-self', data);
   return res.data;
 }

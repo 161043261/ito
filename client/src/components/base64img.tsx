@@ -1,4 +1,4 @@
-import { genBase64Img } from '@/utils/img';
+import { genBase64 } from '@/utils/img';
 
 interface IProps {
   src: string;
@@ -6,14 +6,14 @@ interface IProps {
   className?: string;
 }
 
-export default function Base64Img(props: IProps) {
+export default function ImgBox(props: IProps) {
   const { src, alt, className } = props;
   return (
     <img
       src={src}
       onError={(ev) => {
         console.error('avatar error');
-        ev.currentTarget.src = genBase64Img();
+        ev.currentTarget.src = genBase64();
       }}
       alt={alt ?? 'img'}
       className={className}

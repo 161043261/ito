@@ -1,4 +1,4 @@
-export function genBase64Img(): string {
+export function genBase64(): string {
   const canvas = document.createElement('canvas');
   canvas.width = 200;
   canvas.height = 200;
