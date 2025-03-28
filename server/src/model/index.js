@@ -144,8 +144,6 @@ create table if not exists \`groups\`
   avatar     longtext,
   -- 群公告
   readme     text,
-  -- 群聊备注
-  note_name  varchar(255),
   -- 未读消息数
   unread_cnt int(31)   default 0,
   created_at timestamp default current_timestamp,
@@ -209,7 +207,7 @@ create table if not exists messages
   -- 房间号
   room_key    varchar(255)                            not null,
   -- 消息类型
-  type        enum ('private', 'public')              not null,
+  type        enum ('p2p', 'group')              not null,
   -- 媒体类型
   media_type  enum ('text', 'image', 'video', 'file') not null,
   -- 文件大小, 单位 B

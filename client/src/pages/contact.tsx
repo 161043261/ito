@@ -5,7 +5,7 @@ import useUserInfoStore from '@/store/user_info';
 import { TabType } from '@/types/chat';
 import type { IFriendInfo, ITaggedFriends } from '@/types/friend';
 import type { IGroupInfo } from '@/types/group';
-import type { ITagItem } from '@/types/tag';
+import type { ITagItem } from '@/types/friend';
 import { Form } from 'antd';
 import { useImperativeHandle, useMemo, useState } from 'react';
 

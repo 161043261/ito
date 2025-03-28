@@ -20,3 +20,24 @@ export function fmtDate(date) {
     hourCycle: "h24",
   });
 }
+
+export function camel2snake(obj) {
+  const snackObj = {};
+  for (const key in obj) {
+    const snackKey = key
+      .replace(/([A-Z])/g, "_$1")
+      .toLowerCase()
+      .replace(/^_/, "");
+    snackObj[snackKey] = obj[key];
+  }
+  return snackObj;
+}
+
+export function snack2camel(obj) {
+  const camelObj = {};
+  for (const key in obj) {
+    const camelKey = key.replace(/_(\w)/g, (_, letter) => letter.toUpperCase());
+    camelObj[camelKey] = obj[key];
+  }
+  return camelObj;
+}

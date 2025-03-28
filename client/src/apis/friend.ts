@@ -31,9 +31,9 @@ export async function addTagApi(tagDto: Omit<ITagItem, 'id'>) {
 }
 
 interface IUpdateFriendDto {
-  friend_id: number;
-  note_name: string;
-  tag_id: number;
+  friendId: number;
+  noteName: string;
+  tagId: number;
 }
 
 export async function updateFriendApi(friendDto: IUpdateFriendDto) {

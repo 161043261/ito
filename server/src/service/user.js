@@ -6,7 +6,7 @@ import { resErr, resOk } from "../utils/res.js";
 import { UserState, BaseState } from "../utils/state.js";
 import query from "../utils/query.js";
 import { secretKey } from "../utils/auth.js";
-import { pub } from "../utils/pub.js";
+import pub from "../utils/pub.js";
 
 // import { fileURLToPath } from "url";
 // import { dirname } from "node:path";
@@ -127,7 +127,7 @@ export async function register(req, res) {
       return resErr(res, BaseState.ServerErr);
     }
     // 数组解构赋值, 对象解构赋值
-    const [{ id }] = await query("select * from users where email = ?", [email])[0].id;
+    const [{ id }] = await query("select * from users where email = ?", [email]);
     // 默认标签
     const tag = { user_id: id, user_email: email, name: "好友" };
     await query("insert into tags set ?", [tag]);

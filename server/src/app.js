@@ -1,9 +1,10 @@
 import expressWs from "express-ws";
 import app from "./router/index.js";
 import http from "node:http";
-const port = process.env.port ?? 3000;
+const port = process.env.PORT ?? 3000;
 
 global.chatRooms = {};
+
 app.listen(port, () => {
   console.log("Server listening on port", port);
 });

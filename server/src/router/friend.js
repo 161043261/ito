@@ -1,5 +1,5 @@
 import express from "express";
-import { auth } from "../utils/auth.js";
+import auth from "../utils/auth.js";
 import {
   addFriend,
   addTag,

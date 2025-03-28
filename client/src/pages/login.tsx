@@ -1,7 +1,7 @@
 import useToast from '@/hooks/use_toast';
 import useTokenStore from '@/store/token';
 import useUserInfoStore from '@/store/user_info';
-import { decrypt, encrypt, genRandStr } from '@/utils/crypt';
+import { decrypt, encrypt, genRandStr } from '@/utils/safe';
 import { Button, Checkbox, Form, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';

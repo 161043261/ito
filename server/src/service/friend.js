@@ -1,12 +1,14 @@
 import query from "../utils/query.js";
 import { BaseState } from "../utils/state.js";
 import { resErr, resOk } from "../utils/res.js";
-import { v4 as uuidv4 } from "uuid";
-import { pub } from "../utils/pub.js";
+import { v4 as uuid } from "uuid";
+import pub from "../utils/pub.js";
+import { camel2snake, snack2camel } from "../utils/fmt.js";
 
 async function selectFriendsByTagId(tagId) {
   try {
-    return await query("select id from friends where tag_id = ?", [tagId]);
+    const results = await query("select id from friends where tag_id = ?", [tagId]);
+    return snack2camel(results);
   } catch (err) {
     console.error(err);
     throw err;
@@ -39,6 +41,8 @@ async function insertFriend(friendItem) {
     throw err;
   }
 }
+
+//! >>>>>>>>>>>>>>>>>>>> DAO end >>>>>>>>>>>>>>>>>>>>
 
 /**
  *
@@ -89,7 +93,7 @@ export async function addFriend(req, res) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
-    const uuid = uuidv4();
+    const roomKey = uuid();
     const senderTags = await query("select id from tags where user_id = ?", [sender.id]);
     const senderFriendItem = {
       // todo
@@ -99,18 +103,19 @@ export async function addFriend(req, res) {
       state: global.chatRooms.has(email) ? "online" : "offline", // 好友状态
       note_name: email, // 好友备注
       tag_id: senderTags[0].id, // 好友的标签 ID
-      room_key: uuid, // 房间号
+      room_key: roomKey, // 房间号
     };
 
     const receiverTags = await query(`select id from tags where user_id = ?`, [id]);
     const receiverFriendItem = {
+      // todo
       user_id: id,
       email: sender.email,
       avatar: sender.avatar,
       state: global.chatRooms[sender.email] ? "online" : "offline",
       note_name: sender.email,
       tag_id: receiverTags[0].id,
-      room_key: uuid,
+      room_key: roomKey,
     };
 
     await Promise.all([insertFriend(senderFriendItem), insertFriend(receiverFriendItem)]);
@@ -187,7 +192,7 @@ where f.id = ?;
     `;
     const results = await query(sql, [id]);
     if (results.length !== 0) {
-      return resOk(res, results[0]);
+      return resOk(res, snack2camel(results[0]));
     }
   } catch (err) {
     console.error(err);
@@ -207,7 +212,10 @@ export async function fetchTagList(req, res) {
   }
   try {
     const results = await query("select * from tags where user_id = ?", [userId]);
-    return resOk(res, results);
+    return resOk(
+      res,
+      results.map((item) => snack2camel(item)),
+    );
   } catch (err) {
     console.error(err);
     return resErr(res, BaseState.ServerErr);
@@ -225,7 +233,7 @@ export async function addTag(req, res) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
-    const { affectedRows } = await query("insert into tags set ?", tag);
+    const { affectedRows } = await query("insert into tags set ?", camel2snake(tag));
     if (affectedRows === 1) {
       return resOk(res);
     }
@@ -241,14 +249,14 @@ export async function addTag(req, res) {
  * @param {import("express").Response} res
  */
 export async function updateFriend(req, res) {
-  const { friend_id, note_name, tag_id } = req.body;
-  if (!friend_id || !note_name || !tag_id) {
+  const { friendId, noteName, tagId } = req.body;
+  if (!friendId || !noteName || !tagId) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
     const { affectedRows } = await query(
       "update friends set note_name = ?, tag_id = ? where id = ?",
-      [note_name, tag_id, friend_id],
+      [noteName, tagId, friendId],
     );
     if (affectedRows === 1) {
       return resOk(res);
