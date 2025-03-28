@@ -46,7 +46,7 @@ async function insertFriend(friendItem) {
  * @param {import("express").Response} res
  */
 export async function searchUsers(req, res) {
-  const sender = req.cookies["userInfo"];
+  const sender = req.userInfo;
   console.log("[service/friend] sender:", sender);
   const { email } = req.query;
   if (!sender || !email) {
@@ -82,7 +82,7 @@ export async function searchUsers(req, res) {
  * @param {import("express").Response} res
  */
 export async function addFriend(req, res) {
-  const sender = req.cookies["userInfo"];
+  const sender = req.userInfo;
   // 好友 ID, 好友邮箱, 好友头像
   const { id, email, avatar } = req.body;
   if (!id || !email || !avatar) {
@@ -131,7 +131,7 @@ export async function addFriend(req, res) {
  */
 export async function fetchFriendList(req, res) {
   try {
-    const sender = req.cookies["userInfo"];
+    const sender = req.userInfo;
     const results = await query("select id, name from tags where user_id = ?", [sender.id]);
     if (results.length === 0) {
       return resOk(res, []);
@@ -148,7 +148,8 @@ export async function fetchFriendList(req, res) {
       }
       taggedFriendsList.push(taggedFriends);
     }
-    return resOk(res, taggedFriendsList);
+    const friendList = taggedFriendsList;
+    return resOk(res, friendList);
   } catch (err) {
     console.error(err);
     return resErr(res, BaseState.ServerErr);
@@ -159,8 +160,9 @@ export async function fetchFriendList(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description Find friend by friend's user ID
  */
-export async function findFriendByUserId(req, res) {
+export async function findFriendById(req, res) {
   const { id } = req.query;
   if (!id) {
     return resErr(res, BaseState.ParamErr);

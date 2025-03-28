@@ -21,3 +21,9 @@ export async function logoutApi(reqData: IUserInfo) {
   const res = await request.post<IUserInfo>('/user/logout', reqData);
   return res.data;
 }
+
+export async function updatePwdApi() {}
+
+export async function updateUserInfoApi() {}
+
+export async function startPubApi() {}

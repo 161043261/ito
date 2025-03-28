@@ -51,16 +51,15 @@ export async function login(req, res) {
     }
 
     //! 签发令牌
-    const payload = { id, email };
-    const token = jwt.sign(payload, secretKey);
-
+    //! id, email, password, username, avatar, signature
+    const userInfo = { id, email, password: saltedPwd, username, avatar, signature };
+    const token = jwt.sign(userInfo /** payload */, secretKey);
     await Promise.all([
       query("update friends set state = ? where email = ?", ["online", email]),
       redis.set(`token:${email}`, token, "EX", 60 * 60 * 24),
     ]);
-    //! id, email, password, username, avatar, signature
-    const userInfo = { id, email, password, username, avatar, signature };
-    res.cookie("userInfo", userInfo);
+
+    res.userInfo = userInfo;
     return resOk(res, { token, userInfo });
   } catch (err) {
     console.error("[service/user] login:", err);
@@ -116,6 +115,7 @@ export async function register(req, res) {
     const saltedPwd = salt + "$" + encodedPwd;
 
     const userInfo = {
+      id: 0,
       email,
       password: saltedPwd,
       username: email, // 默认
@@ -127,15 +127,15 @@ export async function register(req, res) {
       return resErr(res, BaseState.ServerErr);
     }
     // 数组解构赋值, 对象解构赋值
-    const [{ id }] = await query("select * from users where email = ?", [email]);
+    const [{ id }] = await query("select * from users where email = ?", [email])[0].id;
     // 默认标签
     const tag = { user_id: id, user_email: email, name: "好友" };
     await query("insert into tags set ?", [tag]);
 
     //! 签发令牌
-    const payload = { id, email };
-    const token = jwt.sign(payload, secretKey);
-    const data = { token, userInfo: { ...userInfo, id } };
+    userInfo.id = id;
+    const token = jwt.sign(userInfo /** payload */, secretKey);
+    const data = { token, userInfo };
     return resOk(res, data);
   } catch (err) {
     console.error("[service/user] register:", err);
@@ -190,17 +190,17 @@ export async function updateUserInfo(req, res) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
-    const userInfo = { avatar, username, signature };
+    const userInfo = { email, avatar, username, signature, id: 0, password: "" };
     const { affectedRows } = await query("update users set ? where email = ?", [userInfo, email]);
     if (affectedRows !== 1) {
       return resErr(res, BaseState.UpdateFailed);
     }
     const results = await query("select * from users where email = ?", [email]);
-    const { id, email } = results[0];
-    const payload = { id, email };
-    const token = jwt.sign(payload, secretKey);
+    const { id, password: saltedPwd } = results[0];
+    [userInfo.id, userInfo.password] = [id, saltedPwd];
+    const token = jwt.sign(userInfo /** payload */, secretKey);
     await redis.set(`token:${email}`, token, "EX", 60 * 60 * 24);
-    return resOk(res, { ...userInfo, ...payload });
+    return resOk(res, userInfo);
   } catch (err) {
     console.error(err);
     return resErr(err, BaseState.ServerErr);

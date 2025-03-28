@@ -1,5 +1,5 @@
 import express from "express";
-import { login, logout, register } from "../service/user.js";
+import { login, logout, register, startPub, updatePwd, updateUserInfo } from "../service/user.js";
 
 const router = express.Router();
 
@@ -10,5 +10,10 @@ export default function createUserRouter() {
   router.post("/logout", logout);
   //! /api/v1/user/register
   router.post("/register", register);
+  //! /api/v1/user/update-pwd
+  router.post("/update-pwd", updatePwd);
+  //! /api/v1/user/update-info
+  router.post("/update-info", updateUserInfo);
+  router.ws("/pub", startPub);
   return router;
 }

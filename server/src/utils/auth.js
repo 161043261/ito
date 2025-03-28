@@ -23,6 +23,7 @@ export function auth(req, res, next) {
       return resJson(res, BaseState.TokenInvalid);
     } else {
       console.log("[utils/user] decoded:", decoded);
+      req.userInfo = decoded;
       next();
     }
   });

@@ -5,7 +5,7 @@ import {
   addTag,
   fetchFriendList,
   fetchTagList,
-  findFriendByUserId,
+  findFriendById,
   searchUsers,
   updateFriend,
 } from "../service/friend.js";
@@ -15,16 +15,16 @@ export default function createFriendRouter() {
   //! /api/v1/friend/search
   router.get("/search", auth, searchUsers);
   //! /api/v1/friend/add
-  router.post("/add", addFriend);
+  router.post("/add", auth, addFriend);
   //! /api/v1/friend/list
-  router.get("/list", fetchFriendList);
+  router.get("/list", auth, fetchFriendList);
   //! /api/v1/friend
-  router.get("/", findFriendByUserId);
+  router.get("/", auth, findFriendById);
   //! /api/v1/friend/tag-list
-  router.get("/tag-list", fetchTagList);
+  router.get("/tag-list", auth, fetchTagList);
   //! /api/v1/friend/add-tag
-  router.post("/add-tag", addTag);
+  router.post("/add-tag", auth, addTag);
   //! /api/v1/friend/update
-  router.post("/update", updateFriend);
+  router.post("/update", auth, updateFriend);
   return router;
 }
