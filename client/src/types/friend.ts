@@ -5,6 +5,9 @@ export interface ITaggedFriends {
   friends: IFriendItem[];
 }
 
+export type TaggedFriendsList = ITaggedFriends[];
+export type FriendList = TaggedFriendsList;
+
 export interface IFriendItem {
   // friends 表字段
   id: number; // friends 表字段 id, 好友 ID

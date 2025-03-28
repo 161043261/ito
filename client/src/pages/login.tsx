@@ -1,5 +1,5 @@
 import useToast from '@/hooks/use_toast';
-import useTokenStore, { ITokenState } from '@/store/token';
+import useTokenStore from '@/store/token';
 import useUserInfoStore from '@/store/user_info';
 import { decrypt, encrypt, genRandStr } from '@/utils/crypt';
 import { Button, Checkbox, Form, Input } from 'antd';
@@ -36,31 +36,37 @@ const Login: React.FC = () => {
   const [loginForm] = Form.useForm<ILoginForm>();
   const [mountModal, setMountModal] = useState(false);
 
-  async function writeLocal(tokenStore: ITokenState, userInfo: IUserInfo) {
-    const userInfoStr = await encrypt(JSON.stringify(userInfo));
-    const { token: token_ } = tokenStore;
-    const token = await encrypt(token_ ?? sessionStorage.getItem('token'));
-    if (userInfoStr && token) {
-      localStorage.setItem('userInfo', userInfoStr);
-      localStorage.setItem('token', token);
+  async function writeLocal(token: string, userInfo: IUserInfo) {
+    const encryptedUserInfo = await encrypt(JSON.stringify(userInfo));
+    const encryptedToken = await encrypt(token);
+    if (encryptedUserInfo && token) {
+      localStorage.setItem('userInfo', encryptedUserInfo);
+      localStorage.setItem('token', encryptedToken);
     }
   }
 
   async function readLocal() {
     const userInfoStr = localStorage.getItem('userInfo');
     const token_ = localStorage.getItem('token');
+    console.log(token_);
     if (!userInfoStr || !token_) {
       return;
     }
-    const userInfo: IUserInfo = JSON.parse(await decrypt(userInfoStr));
-    const token = await decrypt(token_);
-    return { userInfo, token };
+    try {
+      const decryptedStr = await decrypt(userInfoStr);
+      const userInfo: IUserInfo = JSON.parse(decryptedStr);
+      const token = await decrypt(token_);
+      return { userInfo, token };
+    } catch (err) {
+      console.trace(err);
+      return null;
+    }
   }
 
   const handleSubmit = async (form: ILoginForm) => {
     const { email, password } = form;
     const ret = await readLocal();
-    if (ret && ret.userInfo.email === email) {
+    if (ret && ret.userInfo?.email === email) {
       // sessionStorage.setItem('token', res.token);
       // sessionStorage.setIte(JSON.stringify(res.userInfo))
       tokenStore.setToken(ret.token);
@@ -68,7 +74,6 @@ const Login: React.FC = () => {
       toast.success('登录成功');
       return navigate('/');
     }
-
     setLoading(true);
     const reqData = { email, password };
     const res = await loginApi(reqData);
@@ -79,7 +84,7 @@ const Login: React.FC = () => {
       tokenStore.setToken(token);
       userInfoStore.setUserInfo(userInfo);
       if (isRemember) {
-        writeLocal(tokenStore, userInfo);
+        writeLocal(token, userInfo);
       }
       return navigate('/');
     }
@@ -112,7 +117,7 @@ const Login: React.FC = () => {
         if (val) {
           loginForm.setFieldsValue({
             email: val.userInfo.email,
-            password: genRandStr(),
+            password: genRandStr().slice(0, 15),
           });
           setRemember(true);
         } else {
@@ -146,7 +151,7 @@ const Login: React.FC = () => {
               { max: 15, message: '密码最多 15 个字符' },
             ]}
           >
-            <Input placeholder="请输入密码" maxLength={15} />
+            <Input placeholder="请输入密码" maxLength={15} type="password" />
           </Form.Item>
           <Form.Item>
             <div className="flex cursor-pointer flex-row-reverse gap-5 text-slate-700">

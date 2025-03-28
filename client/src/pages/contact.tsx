@@ -3,7 +3,7 @@ import ContactHeader from '@/components/contact_header';
 import useToast from '@/hooks/use_toast';
 import useUserInfoStore from '@/store/user_info';
 import { TabType } from '@/types/chat';
-import type { IFriendInfo, IFriendItem, ITaggedFriends } from '@/types/friend';
+import type { IFriendInfo, ITaggedFriends } from '@/types/friend';
 import type { IGroupInfo } from '@/types/group';
 import type { ITagItem } from '@/types/tag';
 import { Form } from 'antd';
