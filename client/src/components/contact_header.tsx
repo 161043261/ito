@@ -5,7 +5,7 @@ import AddFriendOrGroupModal from './add_modal';
 import CreateGroupModal from './create_group_modal';
 
 const ContactHeader: React.FC = () => {
-  const [mountAddModal, setMountAddModal] = useState(false);
+  const [mountAddModal, setMountAddModal] = useState(true);
   const [mountCreateModal, setMountCreateModal] = useState(false);
   const handleMountAddModal = (doMount: boolean) => {
     setMountAddModal(doMount);
@@ -30,7 +30,9 @@ const ContactHeader: React.FC = () => {
           <Plus theme="outline" size="24" fill="#333" />
         </Tooltip>
       </div>
-      {mountAddModal && <AddFriendOrGroupModal />}
+      {mountAddModal && (
+        <AddFriendOrGroupModal mountModal={mountAddModal} setMountModal={setMountAddModal} />
+      )}
       {mountCreateModal && <CreateGroupModal />}
     </div>
   );

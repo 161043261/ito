@@ -1,7 +1,10 @@
-import { FriendList, IFriendInfo, ITagItem } from '@/types/friend';
+import { FriendList, IFriendInfo, IFriendItem, ITagItem } from '@/types/friend';
 import request from '@/utils/request';
 
-export async function searchUsersApi() {}
+export async function fetchFriendListByNameApi(username: string) {
+  const res = await request.get<IFriendItem[]>(`/friend/name?username=${username}`);
+  return res.data;
+}
 
 export async function addFriendApi() {}
 
@@ -16,7 +19,7 @@ export async function fetchFriendListApi() {
  * @returns Find friend by friend's user ID
  */
 export async function findFriendByIdApi(friendUserId: number) {
-  const res = await request.get<IFriendInfo>(`friend/id=${friendUserId}`);
+  const res = await request.get<IFriendInfo>(`friend/id?id=${friendUserId}`);
   return res.data;
 }
 

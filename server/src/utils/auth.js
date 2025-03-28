@@ -22,7 +22,6 @@ export default function auth(req, res, next) {
     if (err) {
       return resErr(res, BaseState.TokenInvalid);
     } else {
-      console.log("[utils/user] decoded:", decoded);
       req.userInfo = decoded;
       next();
     }

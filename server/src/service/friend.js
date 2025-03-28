@@ -49,17 +49,17 @@ async function insertFriend(friendItem) {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-export async function searchUsers(req, res) {
+export async function findFriendListByName(req, res) {
   const sender = req.userInfo;
   console.log("[service/friend] sender:", sender);
-  const { email } = req.query;
-  if (!sender || !email) {
+  const { username } = req.query;
+  if (!sender || !username) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
     const results = await query(
-      "select id, email, username, avatar from users where email like ?",
-      [`%${email}%`],
+      "select id, email, username, avatar from users where username like ?",
+      [`%${username}%`],
     );
     if (results.length === 0) {
       return resOk(res, []);
@@ -134,7 +134,7 @@ export async function addFriend(req, res) {
  * @param {import("express").Response} res
  * @description Fetch tagged friends list
  */
-export async function fetchFriendList(req, res) {
+export async function findFriendList(req, res) {
   try {
     const sender = req.userInfo;
     const results = await query("select id, name from tags where user_id = ?", [sender.id]);
@@ -205,7 +205,7 @@ where f.id = ?;
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-export async function fetchTagList(req, res) {
+export async function findTagList(req, res) {
   const userId = req.userInfo.id;
   if (!userId) {
     return resErr(res, BaseState.ParamErr);
