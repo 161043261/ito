@@ -1,11 +1,11 @@
 // import crypto from 'node:crypto';
 
-// export const secretKey = crypto.randomBytes(16).toString('hex');
-const randBytes = new Uint8Array(16);
-crypto.getRandomValues(randBytes);
-const secretKey = Array.from(randBytes)
-  .map((byte) => byte.toString(16).padStart(2, '0'))
-  .join('');
+// const randBytes = new Uint8Array(16);
+// crypto.getRandomValues(randBytes);
+// const secretKey = Array.from(randBytes)
+//   .map((byte) => byte.toString(16).padStart(2, '0'))
+//   .join('');
+const secretKey = '00000000000000000000000000000000';
 
 async function importKey() {
   const encoder = new TextEncoder();

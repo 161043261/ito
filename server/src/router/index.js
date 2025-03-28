@@ -3,6 +3,7 @@ import expressWs from "express-ws";
 import bodyParser from "body-parser";
 import createUserRouter from "./user.js";
 import createFriendRouter from "./friend.js";
+import createGroupRouter from "./group.js";
 
 const app = express();
 expressWs(app);
@@ -68,8 +69,18 @@ const userRouter = createUserRouter();
 //! /api/v1/friend/update
 const friendRouter = createFriendRouter();
 
+//! /api/v1/group/list
+//! /api/v1/group/name
+//! /api/v1/group/id
+//! /api/v1/group/create
+//! /api/v1/group/add-friends
+//! /api/v1/group/add-self
+//! /api/v1/group/members
+const groupRouter = createGroupRouter();
+
 app.use("", cors);
 app.use("/api/v1/user", cors, userRouter);
 app.use("/api/v1/friend", cors, friendRouter);
+app.use("/api/v1/group", cors, groupRouter);
 
 export default app;

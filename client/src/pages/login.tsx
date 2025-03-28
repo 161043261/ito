@@ -48,7 +48,6 @@ const Login: React.FC = () => {
   async function readLocal() {
     const userInfoStr = localStorage.getItem('userInfo');
     const token_ = localStorage.getItem('token');
-    console.log(token_);
     if (!userInfoStr || !token_) {
       return;
     }

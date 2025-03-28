@@ -1,12 +1,22 @@
-import { FriendList, IFriendInfo, IFriendItem, ITagItem } from '@/types/friend';
+import {
+  FriendList,
+  IAddFriendDto,
+  IFriendInfo,
+  IFriendItem,
+  ITagItem,
+  IUpdateFriendDto,
+} from '@/types/friend';
 import request from '@/utils/request';
 
 export async function fetchFriendListByNameApi(username: string) {
-  const res = await request.get<IFriendItem[]>(`/friend/name?username=${username}`);
+  const res = await request.get<IFriendInfo[]>(`/friend/name?username=${username}`);
   return res.data;
 }
 
-export async function addFriendApi() {}
+export async function addFriendApi(friendDto: IAddFriendDto) {
+  const res = await request.post<IAddFriendDto>('/friend/add', friendDto);
+  return res.data;
+}
 
 export async function fetchFriendListApi() {
   const res = await request.get<FriendList>('/friend/list');
@@ -31,12 +41,6 @@ export async function fetchTagListApi() {
 export async function addTagApi(tagDto: Omit<ITagItem, 'id'>) {
   const res = await request.post<Omit<ITagItem, 'id'>>('/friend/add-tag', tagDto);
   return res.data;
-}
-
-interface IUpdateFriendDto {
-  friendId: number;
-  noteName: string;
-  tagId: number;
 }
 
 export async function updateFriendApi(friendDto: IUpdateFriendDto) {

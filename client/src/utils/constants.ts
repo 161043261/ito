@@ -23,8 +23,8 @@ export enum FriendState {}
 
 // 4xxx group
 export enum GroupState {
-  YouHasJoined = 4001,
-  FriendHasJoined = 4002,
+  SelfJoined = 4001,
+  FriendJoined = 4002,
 }
 
 // 5xxx msg

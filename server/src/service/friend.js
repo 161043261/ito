@@ -7,8 +7,8 @@ import { camel2snake, snack2camel } from "../utils/fmt.js";
 
 async function selectFriendsByTagId(tagId) {
   try {
-    const results = await query("select id from friends where tag_id = ?", [tagId]);
-    return snack2camel(results);
+    const results = await query("select * from friends where tag_id = ?", [tagId]);
+    return results.map((item) => snack2camel(item));
   } catch (err) {
     console.error(err);
     throw err;
@@ -18,10 +18,10 @@ async function selectFriendsByTagId(tagId) {
 async function selectFriendsByUserId(userId) {
   const friends = [];
   try {
-    const results = await query("select id from tags where user_id = ?", [userId]);
-    for (const result of results) {
-      const results = await selectFriendsByTagId(result.id);
-      friends.push(results);
+    const tags = await query("select id from tags where user_id = ?", [userId]);
+    for (const tag of tags) {
+      const results = await selectFriendsByTagId(tag.id);
+      friends.push(...results);
     }
     return friends;
   } catch (err) {
@@ -48,10 +48,10 @@ async function insertFriend(friendItem) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description Find friend list by username
  */
 export async function findFriendListByName(req, res) {
   const sender = req.userInfo;
-  console.log("[service/friend] sender:", sender);
   const { username } = req.query;
   if (!sender || !username) {
     return resErr(res, BaseState.ParamErr);
@@ -95,30 +95,29 @@ export async function addFriend(req, res) {
   try {
     const roomKey = uuid();
     const senderTags = await query("select id from tags where user_id = ?", [sender.id]);
-    const senderFriendItem = {
-      // todo
-      user_id: sender.id, // 所属用户 ID
-      email, // 好友邮箱
-      avatar, // 好友头像
-      state: global.chatRooms.has(email) ? "online" : "offline", // 好友状态
-      note_name: email, // 好友备注
-      tag_id: senderTags[0].id, // 好友的标签 ID
-      room_key: roomKey, // 房间号
-    };
-
     const receiverTags = await query(`select id from tags where user_id = ?`, [id]);
-    const receiverFriendItem = {
-      // todo
-      user_id: id,
-      email: sender.email,
-      avatar: sender.avatar,
-      state: global.chatRooms[sender.email] ? "online" : "offline",
-      note_name: sender.email,
-      tag_id: receiverTags[0].id,
-      room_key: roomKey,
-    };
-
-    await Promise.all([insertFriend(senderFriendItem), insertFriend(receiverFriendItem)]);
+    await Promise.all([
+      insertFriend({
+        // todo
+        user_id: sender.id, // 所属用户 ID
+        email, // 好友邮箱
+        avatar, // 好友头像
+        state: global.chatRooms[email] ? "online" : "offline", // 好友状态
+        note_name: email, // 好友备注
+        tag_id: senderTags[0].id, // 好友的标签 ID
+        room_key: roomKey, // 房间号
+      }),
+      insertFriend({
+        // todo
+        user_id: id,
+        email: sender.email,
+        avatar: sender.avatar,
+        state: global.chatRooms[sender.email] ? "online" : "offline",
+        note_name: sender.email,
+        tag_id: receiverTags[0].id,
+        room_key: roomKey,
+      }),
+    ]);
     pub({ receiverEmail: email, type: "wsFriendList" });
     pub({ receiverEmail: sender.email, type: "wsFriendList" });
     return resOk(res);
@@ -132,7 +131,7 @@ export async function addFriend(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
- * @description Fetch tagged friends list
+ * @description Find tagged friends list
  */
 export async function findFriendList(req, res) {
   try {

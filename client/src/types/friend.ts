@@ -31,6 +31,7 @@ export interface IFriendInfo extends IFriendItem {
   groupName: string;
   username: string; // 好友的用户名
   signature: string; // 好友的签名
+  flag: boolean;
 }
 
 export interface ITagItem {
@@ -39,4 +40,16 @@ export interface ITagItem {
   name: string; // tag 表字段 name, 标签名
   userId: number; // tag 表字段 user_id, 所属用户 ID
   userEmail: string; // tag 表字段 user_email, 所属用户邮箱
+}
+
+export interface IAddFriendDto {
+  id: number;
+  email: string;
+  avatar: string;
+}
+
+export interface IUpdateFriendDto {
+  friendId: number;
+  noteName: string;
+  tagId: number;
 }

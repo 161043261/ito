@@ -34,7 +34,7 @@ from (select user_id, users.avatar, users.email, users.username, nickname, group
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-export async function addGroup(req, res) {
+export async function createGroup(req, res) {
   const { name, avatar, readme, members } = req.body;
   if (!name) {
     return resErr(res, BaseState.ParamErr);
@@ -50,17 +50,16 @@ export async function addGroup(req, res) {
     };
     const { affectedRows, insertId } = await query("insert into `groups` set ?", group);
     if (affectedRows === 1) {
-      const msg = {
-        sender_id: req.userInfo.id,
-        receiver_id: insertId,
-        type: "group",
-        media_type: "text",
-        state: 0,
-        content: "欢迎",
-        room_key: roomKey,
-      };
       await Promise.all([
-        query("insert into messages set ?", msg),
+        query("insert into messages set ?", {
+          sender_id: req.userInfo.id,
+          receiver_id: insertId,
+          type: "group",
+          media_type: "text",
+          state: 0,
+          content: "欢迎",
+          room_key: roomKey,
+        }),
         query("insert into msg_stats set ?", { room_key: roomKey, total: 1 }),
       ]);
 
@@ -90,7 +89,7 @@ export async function addGroup(req, res) {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-export async function fetchGroupList(req, res) {
+export async function findGroupListByUserId(req, res) {
   const id = req.userInfo.id;
   if (!id) {
     return resErr(res, BaseState.ParamErr);
@@ -118,14 +117,15 @@ from ((select group_id from group_members where user_id = 1) as gm)
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description Find group list by group name
  */
-export async function searchGroup(req, res) {
-  const { name } = req.query;
-  if (!name) {
+export async function findGroupListByName(req, res) {
+  const { groupName } = req.query;
+  if (!groupName) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
-    const results = await query("select * from `groups` where name like ?", [`%${name}%`]);
+    const results = await query("select * from `groups` where name like ?", [`%${groupName}%`]);
     const retList = [];
     if (results.length === 0) {
       return resOk(res, []);
@@ -156,7 +156,7 @@ export async function searchGroup(req, res) {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-export async function fetchGroupInfo(req, res) {
+export async function findGroupById(req, res) {
   const groupId = req.query.groupId;
   if (!groupId) {
     return resErr(res, BaseState.ParamErr);
@@ -175,22 +175,30 @@ from \`groups\` g
        join users u on g.owner_id = u.id
 where g.id = ?;
   `;
-    const [{ id, name, owner_id, owner_email, avatar, readme, room_key, created_at }] = await query(
-      sql,
-      [groupId],
-    );
+    const [
+      {
+        id,
+        name,
+        owner_id: ownerId,
+        owner_email: ownerEmail,
+        avatar,
+        readme,
+        room_key: roomKey,
+        created_at: createdAt,
+      },
+    ] = await query(sql, [groupId]);
     const groupInfo = {
       id,
       name,
-      ownerId: owner_id,
-      ownerEmail: owner_email,
+      ownerId,
+      ownerEmail,
       avatar,
       readme,
-      roomKey: room_key,
-      createdAt: created_at,
+      roomKey,
+      createdAt,
       members: [],
     };
-    const members = await query(groupId, groupInfo.roomKey);
+    const members = await selectGroupMembers(groupId, groupInfo.roomKey);
     for (const member of members) {
       groupInfo.members.push({ ...member });
     }
@@ -212,7 +220,23 @@ export async function addFriends2group(req, res) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
-    const userIdList = friendList.map((item) => item.user);
+    const userIdList = friendList.map((item) => item.userId);
+    const results = await query(
+      "select user_id from group_members where group_id = ? and find_in_set(user_id, ?)",
+      userIdList.join(","),
+    );
+    const filteredList = friendList.filter((friend) =>
+      results.every((result) => result.user_id !== friend.userId),
+    );
+    if (filteredList.length === 0) {
+      return resErr(res, GroupState.FriendJoined);
+    }
+    await query("insert into group_members set ?", filteredList);
+    for (const item of filteredList) {
+      // todo
+      pub({ receiverEmail: item.email, type: "wsGroupList" });
+    }
+    return resOk(res);
   } catch (err) {
     console.error(err);
     return resErr(res, BaseState.ServerErr);
@@ -224,11 +248,47 @@ export async function addFriends2group(req, res) {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-export async function addMe2group(req, res) {}
+export async function addSelf2group(req, res) {
+  const sender = req.userInfo;
+  const groupId = req.body.groupId;
+  if (!groupId) {
+    return resErr(res, BaseState.ParamErr);
+  }
+  try {
+    const results = await query("select id from group_members where group_id = ? and user_id = ?", [
+      groupId,
+      sender.id,
+    ]);
+    if (results.length !== 0) {
+      return resErr(res, GroupState.SelfJoined);
+    }
+    console.warn(sender.username, sender.email);
+    await query("insert into group_members set ?", {
+      group_id: groupId,
+      user_id: sender.id,
+      nickname: sender.username,
+    });
+  } catch (err) {
+    console.error(err);
+    return resErr(res, BaseState.ServerErr);
+  }
+}
 
 /**
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-export async function fetchGroupMembers(req, res) {}
+export async function findGroupMembers(req, res) {
+  const { groupId, roomKey } = req.query;
+  if (!groupId || !roomKey) {
+    return resErr(res, BaseState.ParamErr);
+  }
+  try {
+    const results = await selectGroupMembers(groupId, roomKey);
+    return results.map((item) => snack2camel(item));
+  } catch (err) {
+    console.error(err);
+    return resErr(res, BaseState.ServerErr);
+  }
+}

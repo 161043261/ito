@@ -23,8 +23,8 @@ export const UserState = {
 
 // 4xxx group
 export const GroupState = {
-  YouHasJoined: 4001,
-  FriendHasJoined: 4002,
+  SelfJoined: 4001,
+  FriendJoined: 4002,
 };
 
 // 5xxx msg

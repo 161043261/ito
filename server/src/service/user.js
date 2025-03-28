@@ -129,8 +129,7 @@ export async function register(req, res) {
     // 数组解构赋值, 对象解构赋值
     const [{ id }] = await query("select * from users where email = ?", [email]);
     // 默认标签
-    const tag = { user_id: id, user_email: email, name: "好友" };
-    await query("insert into tags set ?", [tag]);
+    await query("insert into tags set ?", [{ user_id: id, user_email: email, name: "好友" }]);
 
     //! 签发令牌
     userInfo.id = id;

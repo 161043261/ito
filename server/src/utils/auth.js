@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
-import crypto from "node:crypto";
 import { resErr } from "./res.js";
 import { BaseState } from "./state.js";
+// import crypto from "node:crypto";
 
-// secretKey.length === 32
-export const secretKey = crypto.randomBytes(16).toString("hex");
+// export const secretKey = crypto.randomBytes(16).toString("hex");
+export const secretKey = "00000000000000000000000000000000";
 
 /**
  *

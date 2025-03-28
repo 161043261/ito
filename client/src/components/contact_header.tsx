@@ -1,7 +1,7 @@
 import { Plus, Search } from '@icon-park/react';
 import { Input, Tooltip } from 'antd';
 import { useState } from 'react';
-import AddFriendOrGroupModal from './add_modal';
+import AddModal from './add_modal';
 import CreateGroupModal from './create_group_modal';
 
 const ContactHeader: React.FC = () => {
@@ -30,9 +30,7 @@ const ContactHeader: React.FC = () => {
           <Plus theme="outline" size="24" fill="#333" />
         </Tooltip>
       </div>
-      {mountAddModal && (
-        <AddFriendOrGroupModal mountModal={mountAddModal} setMountModal={setMountAddModal} />
-      )}
+      {mountAddModal && <AddModal mountModal={mountAddModal} setMountModal={setMountAddModal} />}
       {mountCreateModal && <CreateGroupModal />}
     </div>
   );
