@@ -6,6 +6,7 @@ export interface IUserInfo {
   avatar: string; // users 表字段 avatar, 用户头像
   username: string; // users 表字段 username, 用户名
   signature?: string; // users 表字段 signature, 签名
+  createdAt?: string;
 }
 
 export interface ILoginReqData {
@@ -43,4 +44,4 @@ export interface IReceiver {
   avatar: string;
 }
 
-export interface ISend {}
+export interface ISender {}

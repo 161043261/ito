@@ -262,7 +262,7 @@ const Contact: React.FC<IProps> = ({ ref, handleSelectChat }: IProps /** props *
               <ul key={item.userId}>
                 <li>{item.username}</li>
                 <li>{item.nickname}</li>
-                <li>{item.createAt.split('.')[0].replace('T', ' ')}</li>
+                <li>{item.createdAt.split('.')[0].replace('T', ' ')}</li>
                 <li>{item.latestMsgTime?.split('.')[0].replace('T', '') || '没有发言记录'}</li>
               </ul>
             ))}
@@ -271,6 +271,17 @@ const Contact: React.FC<IProps> = ({ ref, handleSelectChat }: IProps /** props *
       ),
     },
   ];
+
+  const handleCtxMenu = (key: TabType) => {
+    if (key === TabType.Index) {
+      return (
+        <ul>
+          <li onClick={fetchFriendList}>刷新好友列表</li>
+          <li onClick={() => setMountCreateTagModal(true)}>新建标签</li>
+        </ul>
+      );
+    }
+  };
 
   const ContactList = useMemo(() => {
     return (

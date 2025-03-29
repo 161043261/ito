@@ -21,6 +21,7 @@ export interface IFriendItem {
   unreadCnt: number; // friends 表字段 unread_cnt, 未读消息数
   userId: number; // friends 表字段 user_id, 所属用户 ID
   roomKey: string; // friends 表字段 room_key, 房间号
+  createdAt: string; // friends 表字段 created_at, 创建时间
 }
 
 export interface IFriendExt extends IFriendItem {
@@ -34,10 +35,11 @@ export interface IFriendExt extends IFriendItem {
 
 export interface ITagItem {
   // tag 表字段
-  id: number; // tag 表字段 id, 标签 ID
-  name: string; // tag 表字段 name, 标签名
-  userId: number; // tag 表字段 user_id, 所属用户 ID
-  userEmail: string; // tag 表字段 user_email, 所属用户邮箱
+  id: number; // tags 表字段 id, 标签 ID
+  name: string; // tags 表字段 name, 标签名
+  userId: number; // tags 表字段 user_id, 所属用户 ID
+  userEmail: string; // tags 表字段 user_email, 所属用户邮箱
+  createdAt: string; // tags 表字段 created_at, 创建时间
 }
 
 export interface IAddFriendDto {

@@ -14,6 +14,7 @@ export interface IGroupMemberItem {
   id: number; // group_members 表字段 id, 成员 ID
   nickname: string; // group_members 表字段 nickname, 成员昵称
   userId: number; // group_members 表字段 user_id, 成员的用户 ID
+  createdAt: string; // group_members 表字段 created_at, 创建时间
 }
 
 export interface IGroupExt extends IGroupItem {

@@ -26,6 +26,7 @@ export interface IMsgItem {
   state: 0 | 1; // messages 表字段 state, 消息状态
   // type: friend | group
   type: MsgType; // messages 表字段 type, 消息类型
+  createdAt: string; // messages 表字段 created_at, 创建时间
 }
 
 export interface IMsgStatItem {
