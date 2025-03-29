@@ -5,9 +5,14 @@ import { v4 as uuid } from "uuid";
 import pub from "../utils/pub.js";
 import { camel2snake, snack2camel } from "../utils/fmt.js";
 
+/**
+ *
+ * @param {number} tagId
+ */
 async function selectFriendsByTagId(tagId) {
   try {
     const results = await query("select * from friends where tag_id = ?", [tagId]);
+    console.warn("selectFriendsByTagId:", results);
     return results.map((item) => snack2camel(item));
   } catch (err) {
     console.error(err);
@@ -15,6 +20,10 @@ async function selectFriendsByTagId(tagId) {
   }
 }
 
+/**
+ *
+ * @param {number} userId
+ */
 async function selectFriendsByUserId(userId) {
   const friends = [];
   try {
@@ -30,7 +39,13 @@ async function selectFriendsByUserId(userId) {
   }
 }
 
+/**
+ *
+ * todo: specify typeof friendItem
+ * @param {*} friendItem
+ */
 async function insertFriend(friendItem) {
+  console.warn("insertFriend", friendItem);
   try {
     const { affectedRows } = await query("insert into friends set ?", friendItem);
     if (affectedRows !== 1) {
@@ -102,7 +117,7 @@ export async function addFriend(req, res) {
         user_id: sender.id, // 所属用户 ID
         email, // 好友邮箱
         avatar, // 好友头像
-        state: global.chatRooms[email] ? "online" : "offline", // 好友状态
+        state: global.onlineUsers[email] ? "online" : "offline", // 好友状态
         note_name: email, // 好友备注
         tag_id: senderTags[0].id, // 好友的标签 ID
         room_key: roomKey, // 房间号
@@ -112,7 +127,7 @@ export async function addFriend(req, res) {
         user_id: id,
         email: sender.email,
         avatar: sender.avatar,
-        state: global.chatRooms[sender.email] ? "online" : "offline",
+        state: global.onlineUsers[sender.email] ? "online" : "offline",
         note_name: sender.email,
         tag_id: receiverTags[0].id,
         room_key: roomKey,
@@ -190,6 +205,7 @@ from friends as f
 where f.id = ?;
     `;
     const results = await query(sql, [id]);
+    console.warn("findFriendById:", results);
     if (results.length !== 0) {
       return resOk(res, snack2camel(results[0]));
     }
@@ -211,6 +227,7 @@ export async function findTagList(req, res) {
   }
   try {
     const results = await query("select * from tags where user_id = ?", [userId]);
+    console.warn("findTagList:", results);
     return resOk(
       res,
       results.map((item) => snack2camel(item)),
@@ -232,6 +249,7 @@ export async function addTag(req, res) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
+    console.warn("tag:", tag, "camel2snake(tag):", tag);
     const { affectedRows } = await query("insert into tags set ?", camel2snake(tag));
     if (affectedRows === 1) {
       return resOk(res);

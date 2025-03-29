@@ -206,24 +206,29 @@ export async function updateUserInfo(req, res) {
   }
 }
 
+/**
+ *
+ * @param {any} ws
+ * @param {import("express").Request} req
+ */
 export async function startPub(ws, req) {
   const url = req.url.split("?")[1];
   const params = new URLSearchParams(url);
   const curEmail = params.get("email");
-  global.chatRooms[curEmail] = {
+  global.onlineUsers[curEmail] = {
     ws,
     state: false, // 用户是否在音视频通话
   };
-  for (const email in global.chatRooms) {
+  for (const email in global.onlineUsers) {
     if (email === curEmail) {
       continue;
     }
     pub({ receiverEmail: email, type: "wsFriendList" });
   }
   ws.on("close", () => {
-    if (global.chatRooms[curEmail]) {
-      delete global.chatRooms[curEmail];
-      for (const email in global.chatRooms) {
+    if (global.onlineUsers[curEmail]) {
+      delete global.onlineUsers[curEmail];
+      for (const email in global.onlineUsers) {
         pub({ receiverEmail: email, type: "wsFriendList" });
       }
     }

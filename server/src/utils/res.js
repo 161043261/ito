@@ -1,5 +1,11 @@
 import { Code2Msg } from "./state.js";
 
+/**
+ *
+ * @param {import("express").Response} res
+ * @param {number} code
+ * @param {any} data
+ */
 export function resJson(res, code, data) {
   const body = {
     code: 200,
@@ -12,10 +18,20 @@ export function resJson(res, code, data) {
   res.json(body);
 }
 
+/**
+ *
+ * @param {import("express").Response} res
+ * @param {number} code
+ */
 export function resErr(res, code) {
   resJson(res, code ?? 400 /** code */, "" /** data */);
 }
 
+/**
+ *
+ * @param {import("express").Response} res
+ * @param {any} data
+ */
 export function resOk(res, data) {
   resJson(res, 200 /** code */, data ?? "" /** data */);
 }

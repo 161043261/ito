@@ -1,6 +1,7 @@
 import query from "./query.js";
 
 /**
+ * @param {{ receiverEmail: string, type: 'wsFriendList' | 'wsGroupList' | 'wsMsgList' | 'wsChatRooms' }} data
  * @description type: wsFriendList, wsGroupList, wsMsgList, wsChatRooms
  */
 export default async function pub(data) {
@@ -9,7 +10,7 @@ export default async function pub(data) {
     const results = query("select email from users where id = ?", [data.receiverId]);
     receiverEmail = results[0].email;
   }
-  if (global.chatRooms[receiverEmail]) {
-    global.chatRooms[receiverEmail].ws.send(JSON.stringify(data));
+  if (global.onlineUsers[receiverEmail]) {
+    global.onlineUsers[receiverEmail].ws.send(JSON.stringify(data));
   }
 }

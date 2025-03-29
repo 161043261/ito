@@ -3,10 +3,13 @@ import app from "./router/index.js";
 import http from "node:http";
 const port = process.env.PORT ?? 3000;
 
-global.chatRooms = {};
+/** @type {{ [email: string]: { ws: any, state: boolean } }} */
+globalThis.onlineUsers = {};
+/** @type {{ [roomKey: string]: { id: { ws: any } } }} */
+globalThis.chatRooms = {};
 
 app.listen(port, () => {
-  console.log("Server listening on port", port);
+  console.log(`Server:   http://localhost:${port}/`);
 });
 
 const server = http.createServer(app);

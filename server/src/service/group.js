@@ -5,6 +5,11 @@ import pub from "../utils/pub.js";
 import query from "../utils/query.js";
 import { snack2camel } from "../utils/fmt.js";
 
+/**
+ *
+ * @param {number} groupId
+ * @param {string} roomKey
+ */
 async function selectGroupMembers(groupId, roomKey) {
   try {
     const sql = `
@@ -20,6 +25,7 @@ from (select user_id, users.avatar, users.email, users.username, nickname, group
                   group by sender_id) as m on m.sender_id = s.user_id;
   `;
     const results = await query(sql, [groupId, roomKey]);
+    console.warn("selectGroupMembers:", results);
     return results.map((item) => snack2camel(item));
   } catch (err) {
     console.error(err);
@@ -103,6 +109,7 @@ from ((select group_id from group_members where user_id = 1) as gm)
       `,
       [id],
     );
+    console.warn("findGroupListByUserId:", results);
     return resOk(
       res,
       results.map((item) => snack2camel(item)),
@@ -287,6 +294,7 @@ export async function findGroupMembers(req, res) {
   }
   try {
     const results = await selectGroupMembers(groupId, roomKey);
+    console.warn("findGroupMembers:", results);
     return results.map((item) => snack2camel(item));
   } catch (err) {
     console.error(err);

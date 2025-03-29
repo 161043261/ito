@@ -1,3 +1,8 @@
+/**
+ *
+ * @param {number} bytes
+ * @param {number} fractionDigits
+ */
 export function fmtBytes(bytes, fractionDigits) {
   if (bytes === 0) {
     return "0B";
@@ -8,6 +13,10 @@ export function fmtBytes(bytes, fractionDigits) {
   return Number.parseFloat((bytes / Math.pow(1024, i)).toFixed(fractionDigits)) + sizes[i];
 }
 
+/**
+ *
+ * @param {number | Date} date
+ */
 export function fmtDate(date) {
   if (typeof date === "number") {
     date = new Date(date);
