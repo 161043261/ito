@@ -6,7 +6,7 @@ import { Code2Msg } from "./state.js";
  * @param {number} code
  * @param {any} data
  */
-export function resJson(res, code, data) {
+function resJson(res, code, data) {
   const body = {
     code: 200,
     data: "",

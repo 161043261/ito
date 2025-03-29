@@ -1,9 +1,9 @@
-const CreateTagModal: React.FC = () => {
+const AddTagModal: React.FC = () => {
   return (
     <div>
-      <div>CreateTagModal</div>
+      <div>AddTagModal</div>
     </div>
   );
 };
 
-export default CreateTagModal;
+export default AddTagModal;

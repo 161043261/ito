@@ -1,3 +1,6 @@
+//
+// Reviewed 2025/3/29
+//
 import query from "../utils/query.js";
 import { BaseState } from "../utils/state.js";
 import { resErr, resOk } from "../utils/res.js";
@@ -12,7 +15,6 @@ import { camel2snake, snack2camel } from "../utils/fmt.js";
 async function selectFriendsByTagId(tagId) {
   try {
     const results = await query("select * from friends where tag_id = ?", [tagId]);
-    console.warn("selectFriendsByTagId:", results);
     return results.map((item) => snack2camel(item));
   } catch (err) {
     console.error(err);
@@ -25,14 +27,14 @@ async function selectFriendsByTagId(tagId) {
  * @param {number} userId
  */
 async function selectFriendsByUserId(userId) {
-  const friends = [];
+  const retList = [];
   try {
-    const tags = await query("select id from tags where user_id = ?", [userId]);
-    for (const tag of tags) {
-      const results = await selectFriendsByTagId(tag.id);
-      friends.push(...results);
+    const idWrappers = await query("select id from tags where user_id = ?", [userId]);
+    for (const item of idWrappers) {
+      const camelItems = await selectFriendsByTagId(item.id);
+      retList.push(...camelItems);
     }
-    return friends;
+    return retList;
   } catch (err) {
     console.error(err);
     throw err;
@@ -45,7 +47,7 @@ async function selectFriendsByUserId(userId) {
  * @param {*} friendItem
  */
 async function insertFriend(friendItem) {
-  console.warn("insertFriend", friendItem);
+  friendItem = camel2snake(friendItem);
   try {
     const { affectedRows } = await query("insert into friends set ?", friendItem);
     if (affectedRows !== 1) {
@@ -63,18 +65,19 @@ async function insertFriend(friendItem) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
- * @description Find friend list by username
+ * @description get: username
+ * @description Find friend list by email
  */
-export async function findFriendListByName(req, res) {
+export async function findFriendListByEmail(req, res) {
   const sender = req.userInfo;
-  const { username } = req.query;
-  if (!sender || !username) {
+  const { email } = req.query;
+  if (!sender || !email) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
     const results = await query(
-      "select id, email, username, avatar from users where username like ?",
-      [`%${username}%`],
+      "select id, email, username, avatar from users where email like ?",
+      [`%${email}%`],
     );
     if (results.length === 0) {
       return resOk(res, []);
@@ -99,6 +102,7 @@ export async function findFriendListByName(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description post: id, email, avatar
  */
 export async function addFriend(req, res) {
   const sender = req.userInfo;
@@ -109,27 +113,27 @@ export async function addFriend(req, res) {
   }
   try {
     const roomKey = uuid();
-    const senderTags = await query("select id from tags where user_id = ?", [sender.id]);
-    const receiverTags = await query(`select id from tags where user_id = ?`, [id]);
+    const [senderIds, receiverIds] = await Promise.all([
+      query("select id from tags where user_id = ?", [sender.id]),
+      query(`select id from tags where user_id = ?`, [id]),
+    ]);
     await Promise.all([
       insertFriend({
-        // todo
-        user_id: sender.id, // 所属用户 ID
+        user_id: sender.id, // todo 所属用户 ID
         email, // 好友邮箱
         avatar, // 好友头像
         state: global.OnlineUsers[email] ? "online" : "offline", // 好友状态
         note_name: email, // 好友备注
-        tag_id: senderTags[0].id, // 好友的标签 ID
+        tag_id: senderIds[0].id, // 好友的标签 ID
         room_key: roomKey, // 房间号
       }),
       insertFriend({
-        // todo
-        user_id: id,
+        user_id: id, // todo 所属用户 ID
         email: sender.email,
         avatar: sender.avatar,
         state: global.OnlineUsers[sender.email] ? "online" : "offline",
         note_name: sender.email,
-        tag_id: receiverTags[0].id,
+        tag_id: receiverIds[0].id,
         room_key: roomKey,
       }),
     ]);
@@ -146,6 +150,7 @@ export async function addFriend(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description get
  * @description Find tagged friends list
  */
 export async function findFriendList(req, res) {
@@ -158,10 +163,21 @@ export async function findFriendList(req, res) {
     const taggedFriendsList = [];
     for (const result of results) {
       const taggedFriends = { tagName: result.name, onlineCnt: 0, friends: [] };
-      const friends = await selectFriendsByTagId(result.id);
-      for (const friend of friends) {
-        taggedFriends.friends.push(friend);
-        if (friend.state === "online") {
+
+      // taggedFriends.friends = await selectFriendsByTagId(result.id);
+      // taggedFriends.friends.forEach((item) => item.state === "online" && taggedFriends.onlineCnt++);
+
+      // const friends = await selectFriendsByTagId(result.id);
+      // for (const friend of friends) {
+      //   taggedFriends.friends.push(friend);
+      //   if (friend.state === "online") {
+      //     taggedFriends.onlineCnt++;
+      //   }
+      // }
+
+      for await (const item of selectFriendsByTagId(result.id)) {
+        taggedFriends.friends.push(item);
+        if (item.state === "online") {
           taggedFriends.onlineCnt++;
         }
       }
@@ -179,7 +195,8 @@ export async function findFriendList(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
- * @description Find friend by friend's user ID
+ * @description get: id
+ * @description Find a friend by friend's user ID
  */
 export async function findFriendById(req, res) {
   const { id } = req.query;
@@ -191,6 +208,7 @@ export async function findFriendById(req, res) {
 select f.id      as friend_id,
        f.user_id as friend_user_id,
        f.state,
+       f.note_name
        f.tag_id,
        f.room_key,
        f.unread_cnt,
@@ -205,7 +223,6 @@ from friends as f
 where f.id = ?;
     `;
     const results = await query(sql, [id]);
-    console.warn("findFriendById:", results);
     if (results.length !== 0) {
       return resOk(res, snack2camel(results[0]));
     }
@@ -219,6 +236,7 @@ where f.id = ?;
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description get
  */
 export async function findTagList(req, res) {
   const userId = req.userInfo.id;
@@ -227,7 +245,6 @@ export async function findTagList(req, res) {
   }
   try {
     const results = await query("select * from tags where user_id = ?", [userId]);
-    console.warn("findTagList:", results);
     return resOk(
       res,
       results.map((item) => snack2camel(item)),
@@ -242,8 +259,9 @@ export async function findTagList(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description post: userId, userEmail, name
  */
-export async function createTag(req, res) {
+export async function addTag(req, res) {
   // userId, userEmail, name
   const tag = req.body;
   if (!tag) {
@@ -264,6 +282,7 @@ export async function createTag(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description post: friendId, noteName, tagId
  */
 export async function updateFriend(req, res) {
   const { friendId, noteName, tagId } = req.body;
@@ -277,6 +296,8 @@ export async function updateFriend(req, res) {
     );
     if (affectedRows === 1) {
       return resOk(res);
+    } else {
+      return resErr(res, BaseState.UpdateFailed);
     }
   } catch (err) {
     console.error(err);

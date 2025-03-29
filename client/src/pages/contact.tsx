@@ -8,7 +8,7 @@ import { Form, TabsProps } from 'antd';
 import { useImperativeHandle, useMemo, useState } from 'react';
 import ImgBox from '@/components/base64img';
 import {
-  createTagApi,
+  addTagApi,
   fetchFriendByIdApi,
   fetchFriendListApi,
   fetchTagListApi,
@@ -50,7 +50,7 @@ const Contact: React.FC<IProps> = ({ ref, handleSelectChat }: IProps /** props *
   const [tagList, setTagList] = useState<ITagItem[]>([]);
   const [friendFormInst] = Form.useForm<IFriendForm>();
   // 新建标签的弹窗挂载/卸载
-  const [mountCreateTagModal, setMountCreateTagModal] = useState(false);
+  const [mountAddTagModal, setMountAddTagModal] = useState(false);
   // 新建标签名
   const [newTagName, setNewTagName] = useState('');
   // 群聊列表
@@ -169,7 +169,7 @@ const Contact: React.FC<IProps> = ({ ref, handleSelectChat }: IProps /** props *
   };
 
   // 新建标签
-  const createTag = async () => {
+  const addTag = async () => {
     if (!newTagName) {
       toast.warning('请输入标签名');
       return;
@@ -180,12 +180,12 @@ const Contact: React.FC<IProps> = ({ ref, handleSelectChat }: IProps /** props *
         userEmail: userInfo.email,
         name: newTagName,
       };
-      const res = await createTagApi(params);
+      const res = await addTagApi(params);
       if (res.code === BaseState.Success) {
         toast.success('新建标签成功');
         fetchFriendList();
         _fetchTagList();
-        setMountCreateTagModal(false);
+        setMountAddTagModal(false);
       } else {
         toast.error('新建标签失败');
       }
@@ -277,7 +277,7 @@ const Contact: React.FC<IProps> = ({ ref, handleSelectChat }: IProps /** props *
       return (
         <ul>
           <li onClick={fetchFriendList}>刷新好友列表</li>
-          <li onClick={() => setMountCreateTagModal(true)}>新建标签</li>
+          <li onClick={() => setMountAddTagModal(true)}>新建标签</li>
         </ul>
       );
     }

@@ -1,0 +1,22 @@
+[
+  {
+    "user": [
+      { "url": "/api/v1/user/login", "method": "post" },
+      { "url": "/api/v1/user/logout", "method": "post" },
+      { "url": "/api/v1/user/register", "method": "post" },
+      { "url": "/api/v1/user/update-pwd", "method": "post" },
+      { "url": "/api/v1/user/update-info", "method": "post" }
+    ]
+  },
+  {
+    "friend": [
+      { "url": "/api/v1/friend/email", "method": "get" },
+      { "url": "/api/v1/friend/add", "method": "post" },
+      { "url": "/api/v1/friend/list", "method": "get" },
+      { "url": "/api/v1/friend/id", "method": "get" },
+      { "url": "/api/v1/friend/tag-list", "method": "get" },
+      { "url": "/api/v1/friend/add-tag", "method": "post" },
+      { "url": "/api/v1/friend/update", "method": "post" }
+    ]
+  }
+]

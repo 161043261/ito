@@ -1,3 +1,6 @@
+//
+// Reviewed 2025/3/29
+//
 import { v4 as uuid } from "uuid";
 import { BaseState, GroupState } from "../utils/state.js";
 import { resOk, resErr } from "../utils/res.js";
@@ -39,6 +42,7 @@ from (select user_id, users.avatar, users.email, users.username, nickname, group
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description post: name, avatar, readme, members
  */
 export async function createGroup(req, res) {
   const { name, avatar, readme, members } = req.body;
@@ -47,14 +51,14 @@ export async function createGroup(req, res) {
   }
   try {
     const roomKey = uuid();
-    const group = {
+    const { affectedRows, insertId } = await query("insert into `groups` set ?", {
       name,
       avatar,
       readme,
       room_key: roomKey,
       owner_id: req.userInfo.id,
-    };
-    const { affectedRows, insertId } = await query("insert into `groups` set ?", group);
+      unread_cnt: 0,
+    });
     if (affectedRows === 1) {
       await Promise.all([
         query("insert into messages set ?", {
@@ -69,6 +73,7 @@ export async function createGroup(req, res) {
         query("insert into msg_stats set ?", { room_key: roomKey, total: 1 }),
       ]);
 
+      // Add self
       members.push({
         userId: req.userInfo.id,
         email: req.userInfo.email,
@@ -94,6 +99,7 @@ export async function createGroup(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description get
  */
 export async function findGroupListByUserId(req, res) {
   const id = req.userInfo.id;
@@ -109,7 +115,6 @@ from ((select group_id from group_members where user_id = 1) as gm)
       `,
       [id],
     );
-    console.warn("findGroupListByUserId:", results);
     return resOk(
       res,
       results.map((item) => snack2camel(item)),
@@ -124,6 +129,7 @@ from ((select group_id from group_members where user_id = 1) as gm)
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description get: name
  * @description Find group list by group name
  */
 export async function findGroupListByName(req, res) {
@@ -149,7 +155,7 @@ export async function findGroupListByName(req, res) {
         memberNum: members.length,
         // 是否已加入
         flag: members.some((item) => item.user_id === userId),
-        id: group.id,
+        id: group.id, // groupId
       });
     }
     return resOk(res, retList);
@@ -163,6 +169,7 @@ export async function findGroupListByName(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description get: id
  */
 export async function findGroupById(req, res) {
   const groupId = req.query.id;
@@ -195,7 +202,7 @@ where g.id = ?;
         created_at: createdAt,
       },
     ] = await query(sql, [groupId]);
-    const groupInfo = {
+    const groupData = {
       id,
       name,
       ownerId,
@@ -206,11 +213,12 @@ where g.id = ?;
       createdAt,
       members: [],
     };
-    const members = await selectGroupMembers(groupId, groupInfo.roomKey);
-    for (const member of members) {
-      groupInfo.members.push({ ...member });
-    }
-    return resOk(res, groupInfo);
+    groupData.members = await selectGroupMembers(groupId, groupData.roomKey);
+    // const members = await selectGroupMembers(groupId, groupData.roomKey);
+    // for (const member of members) {
+    //   groupData.members.push({ ...member });
+    // }
+    return resOk(res, groupData);
   } catch (err) {
     console.error(err);
     return resErr(res, BaseState.ServerErr);
@@ -221,6 +229,7 @@ where g.id = ?;
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description post: groupId, friendList
  */
 export async function addFriends2group(req, res) {
   const { groupId, friendList } = req.body;
@@ -231,7 +240,7 @@ export async function addFriends2group(req, res) {
     const userIdList = friendList.map((item) => item.userId);
     const results = await query(
       "select user_id from group_members where group_id = ? and find_in_set(user_id, ?)",
-      userIdList.join(","),
+      [groupId, userIdList.join(",")],
     );
     const filteredList = friendList.filter((friend) =>
       results.every((result) => result.user_id !== friend.userId),
@@ -241,7 +250,7 @@ export async function addFriends2group(req, res) {
     }
     await query("insert into group_members set ?", filteredList);
     for (const item of filteredList) {
-      // todo
+      // todo pub({ receiverEmail: item.nickname, type: "wsGroupList" });
       pub({ receiverEmail: item.email, type: "wsGroupList" });
     }
     return resOk(res);
@@ -255,6 +264,7 @@ export async function addFriends2group(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description post: groupId
  */
 export async function addSelf2group(req, res) {
   const sender = req.userInfo;
@@ -270,11 +280,20 @@ export async function addSelf2group(req, res) {
     if (results.length !== 0) {
       return resErr(res, GroupState.SelfJoined);
     }
-    console.warn(sender.username, sender.email);
     await query("insert into group_members set ?", {
       group_id: groupId,
       user_id: sender.id,
       nickname: sender.username,
+    });
+    const [{ name: groupName, room_key: roomKey }] = await query(
+      "select name, room_key from `groups` where id = ?",
+      [groupId],
+    );
+    pub({ receiverEmail: sender.email, name: "wsGroupList" });
+    return resOk(res, {
+      groupId,
+      groupName,
+      roomKey,
     });
   } catch (err) {
     console.error(err);
@@ -286,6 +305,7 @@ export async function addSelf2group(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description post: groupId, roomKey
  */
 export async function findGroupMembers(req, res) {
   const { groupId, roomKey } = req.query;
@@ -294,8 +314,7 @@ export async function findGroupMembers(req, res) {
   }
   try {
     const results = await selectGroupMembers(groupId, roomKey);
-    console.warn("findGroupMembers:", results);
-    return results.map((item) => snack2camel(item));
+    return resOk(res, results);
   } catch (err) {
     console.error(err);
     return resErr(res, BaseState.ServerErr);

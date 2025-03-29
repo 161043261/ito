@@ -97,7 +97,7 @@ create table if not exists friends
   });
 }
 
-function createTags() {
+function addTags() {
   const sql = `
 -- 标签表
 create table if not exists tags
@@ -259,7 +259,7 @@ pool.query("select 1", (err) => {
     process.exit(1);
   }
   createUsers();
-  createTags();
+  addTags();
   createMessages();
 });
 

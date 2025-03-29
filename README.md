@@ -49,7 +49,6 @@
 | created_at |
 | id         |
 | name       |
-| note_name  |
 | owner_id   |
 | readme     |
 | room_key   |

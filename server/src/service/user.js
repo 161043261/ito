@@ -1,3 +1,6 @@
+//
+// Reviewed 2025/3/29
+//
 import crypto, { randomUUID } from "node:crypto";
 // import { promises as fs } from "node:fs";
 import jwt from "jsonwebtoken";
@@ -22,6 +25,7 @@ const redis = new Redis({
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description post: email, password
  */
 export async function login(req, res) {
   const { email, password } = req.body;
@@ -71,6 +75,7 @@ export async function login(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description post: email
  */
 export async function logout(req, res) {
   const { email } = req.body;
@@ -94,6 +99,7 @@ export async function logout(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description
  */
 export async function register(req, res) {
   const { email, password, avatar } = req.body;
@@ -124,8 +130,9 @@ export async function register(req, res) {
     };
     const { affectedRows } = await query("insert into users set ?", userInfo);
     if (affectedRows !== 1) {
-      return resErr(res, BaseState.ServerErr);
+      return resErr(res, BaseState.UpdateFailed);
     }
+
     // 数组解构赋值, 对象解构赋值
     const [{ id }] = await query("select * from users where email = ?", [email]);
     // 默认标签
@@ -146,6 +153,7 @@ export async function register(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description post: email, password
  */
 export async function updatePwd(req, res) {
   const { email, password } = req.body;
@@ -182,6 +190,7 @@ export async function updatePwd(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
+ * @description post: email, avatar, username, signature
  */
 export async function updateUserInfo(req, res) {
   const { email, avatar, username, signature } = req.body;
@@ -189,17 +198,17 @@ export async function updateUserInfo(req, res) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
-    const userInfo = { email, avatar, username, signature, id: 0, password: "" };
+    const userInfo = { email, avatar, username, signature };
     const { affectedRows } = await query("update users set ? where email = ?", [userInfo, email]);
     if (affectedRows !== 1) {
       return resErr(res, BaseState.UpdateFailed);
     }
     const results = await query("select * from users where email = ?", [email]);
-    const { id, password: saltedPwd } = results[0];
-    [userInfo.id, userInfo.password] = [id, saltedPwd];
+    const { id, password: saltedPwd, updated_at } = results[0];
+    [userInfo.id, userInfo.password, userInfo.updatedAt] = [id, saltedPwd, updated_at];
     const token = jwt.sign(userInfo /** payload */, secretKey);
     await redis.set(`token:${email}`, token, "EX", 60 * 60 * 24);
-    return resOk(res, userInfo);
+    return resOk(res, { token, userInfo });
   } catch (err) {
     console.error(err);
     return resErr(err, BaseState.ServerErr);

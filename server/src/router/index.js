@@ -65,7 +65,7 @@ const userRouter = createUserRouter();
 //! /api/v1/friend/list
 //! /api/v1/friend
 //! /api/v1/friend/tag-list
-//! /api/v1/friend/create-tag
+//! /api/v1/friend/add-tag
 //! /api/v1/friend/update
 const friendRouter = createFriendRouter();
 

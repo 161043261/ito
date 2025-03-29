@@ -2,7 +2,7 @@ import useToast from '@/hooks/use_toast';
 import { IGroupDto } from '@/types/group';
 import { useState } from 'react';
 import { Button, Empty, Input, Modal, Tabs, TabsProps } from 'antd';
-import { addFriendApi, fetchFriendListByNameApi } from '@/apis/friend';
+import { addFriendApi, fetchFriendListByEmailApi } from '@/apis/friend';
 import { BaseState } from '@/utils/constants';
 import { Search } from '@icon-park/react';
 import ImgBox from './base64img';
@@ -30,24 +30,24 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
     }[]
   >([]);
   const [groupList, setGroupList] = useState<IGroupDto[]>([]);
-  const [friendName, setFriendName] = useState('');
+  const [friendEmail, setFriendEmail] = useState('');
   const [groupName, setGroupName] = useState('');
   const [isLoading, setLoading] = useState(false);
 
   const handleFriendNameChange = (ev: { target: { value: string } }) => {
-    setFriendName(ev.target.value);
+    setFriendEmail(ev.target.value);
     if (ev.target.value === '') {
       setFriendList([]);
     }
   };
 
-  const _fetchFriendListByName = async (username: string) => {
+  const _fetchFriendListByEmail = async (email: string) => {
     try {
-      if (username === '') {
+      if (email === '') {
         setFriendList([]);
         return;
       }
-      const res = await fetchFriendListByNameApi(username);
+      const res = await fetchFriendListByEmailApi(email);
       if (res.code === BaseState.Success && res.data) {
         setFriendList(res.data);
       } else {
@@ -138,7 +138,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
               prefix={<Search theme="outline" size="24" fill="#333" />}
               onChange={(ev) => handleFriendNameChange(ev)}
             />
-            <Button type="primary" onClick={() => _fetchFriendListByName(friendName)}>
+            <Button type="primary" onClick={() => _fetchFriendListByEmail(friendEmail)}>
               查找
             </Button>
           </div>

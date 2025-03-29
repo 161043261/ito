@@ -1,8 +1,8 @@
 import { FriendList, IAddFriendDto, IFriendExt, ITagItem, IUpdateFriendDto } from '@/types/friend';
 import request from '@/utils/request';
 
-export async function fetchFriendListByNameApi(username: string) {
-  const res = await request.get<IFriendExt[]>(`/friend/name?username=${username}`);
+export async function fetchFriendListByEmailApi(email: string) {
+  const res = await request.get<IFriendExt[]>(`/friend/email?email=${email}`);
   return res.data;
 }
 
@@ -31,8 +31,8 @@ export async function fetchTagListApi() {
   return res.data;
 }
 
-export async function createTagApi(tagDto: Omit<ITagItem, 'id'>) {
-  const res = await request.post<Omit<ITagItem, 'id'>>('/friend/create-tag', tagDto);
+export async function addTagApi(tagDto: Omit<ITagItem, 'id'>) {
+  const res = await request.post<Omit<ITagItem, 'id'>>('/friend/add-tag', tagDto);
   return res.data;
 }
 

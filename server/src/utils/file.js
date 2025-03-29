@@ -14,5 +14,8 @@ export function getFileType(filename) {
     case "svg":
     case "webp":
       return "image";
+
+    default:
+      return "file";
   }
 }
