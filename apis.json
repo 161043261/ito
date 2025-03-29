@@ -1,22 +1,84 @@
-[
-  {
-    "user": [
-      { "url": "/api/v1/user/login", "method": "post" },
-      { "url": "/api/v1/user/logout", "method": "post" },
-      { "url": "/api/v1/user/register", "method": "post" },
-      { "url": "/api/v1/user/update-pwd", "method": "post" },
-      { "url": "/api/v1/user/update-info", "method": "post" }
-    ]
-  },
-  {
-    "friend": [
-      { "url": "/api/v1/friend/email", "method": "get" },
-      { "url": "/api/v1/friend/add", "method": "post" },
-      { "url": "/api/v1/friend/list", "method": "get" },
-      { "url": "/api/v1/friend/id", "method": "get" },
-      { "url": "/api/v1/friend/tag-list", "method": "get" },
-      { "url": "/api/v1/friend/add-tag", "method": "post" },
-      { "url": "/api/v1/friend/update", "method": "post" }
-    ]
-  }
-]
+{
+  "prefix": "/api/v1",
+  "routes": [
+    {
+      "user": [
+        {
+          "url": "/user/login",
+          "method": "post",
+          "params": ["email", "password"]
+        },
+        { "url": "/user/logout", "method": "post", "params": ["email"] },
+        {
+          "url": "/user/register",
+          "method": "post",
+          "params": ["email", "password", "avatar"]
+        },
+        {
+          "url": "/user/update-pwd",
+          "method": "post",
+          "params": ["email", "password"]
+        },
+        {
+          "url": "/user/update-info",
+          "method": "post",
+          "params": ["email", "avatar", "username", "signature"]
+        }
+      ]
+    },
+    {
+      "friend": [
+        { "url": "/friend/email", "method": "get", "params": ["email"] },
+        {
+          "url": "/friend/add",
+          "method": "post",
+          "params": ["id", "email", "avatar"]
+        },
+        { "url": "/friend/list", "method": "get", "params": [] },
+        { "url": "/friend/id", "method": "get", "params": ["id"] },
+        { "url": "/friend/tag-list", "method": "get", "params": [] },
+        {
+          "url": "/friend/add-tag",
+          "method": "post",
+          "params": ["userId", "userEmail", "name"]
+        },
+        {
+          "url": "/friend/update",
+          "method": "post",
+          "params": ["friendId", "noteName", "tagId"]
+        }
+      ]
+    },
+    {
+      "group": [
+        {
+          "url": "/group/list",
+          "method": "get",
+          "params": []
+        },
+        { "url": "/group/name", "method": "get", "params": ["name"] },
+        { "url": "/group/id", "method": "get", "params": ["id"] },
+        {
+          "url": "/group/create",
+          "method": "post",
+          "params": ["name", "avatar", "readme", "members"]
+        },
+        {
+          "url": "/group/add-friends",
+          "method": "post",
+          "params": ["groupId", "friendList"]
+        },
+        {
+          "url": "/group/add-self",
+          "method": "post",
+          "params": ["groupId"]
+        },
+        {
+          "url": "/group/members",
+          "method": "get",
+          "params": ["groupId", "roomKey"]
+        }
+      ]
+    }
+  ]
+}

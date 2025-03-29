@@ -99,7 +99,7 @@ export async function logout(req, res) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
- * @description
+ * @description post: email, password, avatar
  */
 export async function register(req, res) {
   const { email, password, avatar } = req.body;

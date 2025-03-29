@@ -65,7 +65,7 @@ async function insertFriend(friendItem) {
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
- * @description get: username
+ * @description get: email
  * @description Find friend list by email
  */
 export async function findFriendListByEmail(req, res) {

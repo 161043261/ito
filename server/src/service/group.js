@@ -6,7 +6,7 @@ import { BaseState, GroupState } from "../utils/state.js";
 import { resOk, resErr } from "../utils/res.js";
 import pub from "../utils/pub.js";
 import query from "../utils/query.js";
-import { snack2camel } from "../utils/fmt.js";
+import { camel2snake, snack2camel } from "../utils/fmt.js";
 
 /**
  *
@@ -43,6 +43,7 @@ from (select user_id, users.avatar, users.email, users.username, nickname, group
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  * @description post: name, avatar, readme, members
+ * @description members: { userId, email, avatar }
  */
 export async function createGroup(req, res) {
   const { name, avatar, readme, members } = req.body;
@@ -230,6 +231,7 @@ where g.id = ?;
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  * @description post: groupId, friendList
+ * @description friendList: [{ groupId, nickname, userId }]
  */
 export async function addFriends2group(req, res) {
   const { groupId, friendList } = req.body;
@@ -248,7 +250,10 @@ export async function addFriends2group(req, res) {
     if (filteredList.length === 0) {
       return resErr(res, GroupState.FriendJoined);
     }
-    await query("insert into group_members set ?", filteredList);
+    await query(
+      "insert into group_members set ?",
+      filteredList.map((item) => camel2snake(item)),
+    );
     for (const item of filteredList) {
       // todo pub({ receiverEmail: item.nickname, type: "wsGroupList" });
       pub({ receiverEmail: item.email, type: "wsGroupList" });
