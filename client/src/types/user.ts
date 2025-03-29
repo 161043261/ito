@@ -36,9 +36,11 @@ export interface IRegisterResData {
   };
 }
 
-export interface IReceiverInfo {
+export interface IReceiver {
   email: string;
   username: string; // 用户名 username
   alias: string; // 备注 noteName 或群昵称 nickname 或用户名 username
   avatar: string;
 }
+
+export interface ISend {}

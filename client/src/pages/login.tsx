@@ -7,20 +7,9 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { loginApi } from '@/apis/user';
 import { BaseState } from '@/utils/constants';
-import styled from 'styled-components';
-import bg from '@/assets/images/bg.jpg';
 import { IUserInfo, ILoginReqData } from '@/types/user';
 
 import styles from './login.module.scss';
-
-// styled-components
-const Background = styled.div`
-  background: center no-repeat;
-  background-size: cover;
-  background-image: url(${bg});
-  width: 100vw;
-  height: 100vh;
-`;
 
 const Login: React.FC = () => {
   type ILoginForm = ILoginReqData;
@@ -88,7 +77,7 @@ const Login: React.FC = () => {
       return navigate('/');
     }
 
-    toast.error('登录失败, 请重试');
+    toast.error('登录失败');
     setLoading(false);
   };
 
@@ -128,7 +117,7 @@ const Login: React.FC = () => {
   );
 
   return (
-    <Background>
+    <div className="h-dvh w-dvw bg-[url('/bg.jpg')] bg-cover bg-center bg-no-repeat">
       <div
         className={`${styles.loginContainer} absolute top-[50%] left-[10%] w-100 translate-y-[-50%] px-7`}
       >
@@ -179,7 +168,7 @@ const Login: React.FC = () => {
           <></>
         )}
       </div>
-    </Background>
+    </div>
   );
 };
 

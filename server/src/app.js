@@ -4,9 +4,9 @@ import http from "node:http";
 const port = process.env.PORT ?? 3000;
 
 /** @type {{ [email: string]: { ws: any, state: boolean } }} */
-globalThis.onlineUsers = {};
-/** @type {{ [roomKey: string]: { id: { ws: any } } }} */
-globalThis.chatRooms = {};
+globalThis.OnlineUsers = {};
+/** @type {{ [roomKey: string]: { receiverId: { ws: any } } }} */
+globalThis.ChatRooms = {};
 
 app.listen(port, () => {
   console.log(`Server:   http://localhost:${port}/`);

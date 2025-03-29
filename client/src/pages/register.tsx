@@ -4,21 +4,10 @@ import { ILoginReqData } from '@/types/user';
 import { BaseState } from '@/utils/constants';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import styled from 'styled-components';
-import bg from '@/assets/images/bg.jpg';
 
 import styles from './register.module.scss';
 import { Button, Form, Input } from 'antd';
 import { genBase64 } from '@/utils/img';
-
-// styled-components
-const Background = styled.div`
-  background: center no-repeat;
-  background-size: cover;
-  background-image: url(${bg});
-  width: 100vw;
-  height: 100vh;
-`;
 
 export default function Register() {
   type IRegisterForm = ILoginReqData & {
@@ -57,7 +46,7 @@ export default function Register() {
   };
 
   return (
-    <Background>
+    <div className="h-dvh w-dvw bg-[url('/bg.jpg')] bg-cover bg-center bg-no-repeat">
       <div
         className={`${styles.registerContainer} absolute top-[50%] left-[10%] w-100 translate-y-[-50%] px-7`}
       >
@@ -102,6 +91,6 @@ export default function Register() {
           </Form.Item>
         </Form>
       </div>
-    </Background>
+    </div>
   );
 }

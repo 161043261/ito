@@ -5,7 +5,7 @@ import useToast from '@/hooks/use_toast';
 import useUserInfoStore from '@/store/user_info';
 
 import type { IChatBoxRef, IContactRef } from '@/types/fc_expose';
-import type { IReceiverInfo } from '@/types/user';
+import type { IReceiver } from '@/types/user';
 import { BaseState } from '@/utils/constants';
 
 import { Button, Popover, Tooltip } from 'antd';
@@ -20,14 +20,8 @@ import UserInfoModal from '@/components/user_info_modal';
 import AudioModal from '@/components/audio_modal';
 import VideoModal from '@/components/video_modal';
 
-import styled from 'styled-components';
-import type { IGroupInfo, IGroupItem } from '@/types/group';
-import type { IFriendInfo, IFriendItem } from '@/types/friend';
-
-const BgContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
-`;
+import type { IGroupExt, IGroupItem } from '@/types/group';
+import type { IFriendExt, IFriendItem } from '@/types/friend';
 
 const Home: React.FC = () => {
   const toast = useToast();
@@ -45,14 +39,14 @@ const Home: React.FC = () => {
   const [mountAudioModal, setMountAudioModal] = useState(false);
   // 视频聊天弹窗
   const [mountVideoModal, setMountVideoModal] = useState(false);
-  // 当前选中的单聊或群聊
+  // 当前选中的好友或群聊
   const [curChat, setCurChat] = useState<IFriendItem | IGroupItem | null>(null);
   // 房间号
   const [roomKey, setRoomKey] = useState<string>('');
   // 聊天模式: 音频; 视频; 音视频
   const [chatMode, setChatMode] = useState<string>('');
   // 接收者列表
-  const [receiverList, setReceiverList] = useState<IReceiverInfo[]>([]);
+  const [receiverList, setReceiverList] = useState<IReceiver[]>([]);
 
   // useRef 只会在组件挂载时调用 1 次, 组件重新渲染时, 不会重新调用 useRef
   // websocket 实例
@@ -79,7 +73,7 @@ const Home: React.FC = () => {
     try {
       const res = await logoutApi(userInfo);
       if (res.code !== BaseState.Success) {
-        toast.error('退出登录失败, 请重试');
+        toast.error('退出登录失败');
         return;
       }
       userInfoStore.clearUserInfo();
@@ -92,7 +86,7 @@ const Home: React.FC = () => {
       }
     } catch (err) {
       console.error(err);
-      toast.error('退出登录失败, 请重试');
+      toast.error('退出登录失败');
     }
   };
 
@@ -143,7 +137,7 @@ const Home: React.FC = () => {
             setRoomKey(roomKey);
           } catch (err) {
             console.error(err);
-            toast.error('音视频聊天失败, 请重试');
+            toast.error('音视频聊天失败');
           }
           break;
       }
@@ -164,9 +158,9 @@ const Home: React.FC = () => {
     }
   };
 
-  const handleSelectChat = (chatInfo: IFriendInfo | IGroupInfo) => {
+  const handleSelectChat = (chat: IFriendExt | IGroupExt) => {
     navigate('/chat');
-    setCurChat(chatInfo);
+    setCurChat(chat);
   };
 
   return (

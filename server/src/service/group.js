@@ -165,7 +165,7 @@ export async function findGroupListByName(req, res) {
  * @param {import("express").Response} res
  */
 export async function findGroupById(req, res) {
-  const groupId = req.query.groupId;
+  const groupId = req.query.id;
   if (!groupId) {
     return resErr(res, BaseState.ParamErr);
   }

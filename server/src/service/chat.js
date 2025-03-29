@@ -1,5 +1,8 @@
-import { camel2snake } from "../utils/fmt";
-import query from "../utils/query";
+import { camel2snake, fmtBytes } from "../utils/fmt";
+import pub from "../utils/pub.js";
+import query from "../utils/query.js";
+import { BaseState } from "../utils/state.js";
+import { resOk, resErr } from "../utils/res.js";
 
 /**
  *
@@ -15,13 +18,14 @@ async function updateMsgStats(roomKey) {
 
 /**
  *
- * @param {'p2p' | 'group'} type
+ * @param {'friend' | 'group'} type
  * @param {string} roomKey
  * @param {any} writeMsg
  * @param {any} sendMsg
  */
 async function writeAndSend(type, roomKey, writeMsg, sendMsg) {
-  if (type === "group" || (type === "p2p" && global.chatRooms[roomKey][sendMsg.receiverId])) {
+  // 群聊, 或
+  if (type === "group" || (type === "friend" && global.ChatRooms[roomKey][sendMsg.receiverId])) {
     writeMsg.state = 1;
   } else {
     writeMsg.state = 0;
@@ -32,4 +36,40 @@ async function writeAndSend(type, roomKey, writeMsg, sendMsg) {
     updateMsgStats(roomKey),
   ]);
   // todo
+  sendMsg.fileSize = fmtBytes(writeMsg.fileSize);
+  for (const receiverId /** userId | groupId */ in global.ChatRooms[roomKey]) {
+    global.ChatRooms[roomKey][receiverId].send(JSON.stringify(sendMsg));
+  }
+  if (type === "group") {
+    const results = await query("select user_id from group_members where group_id = ?", [
+      sendMsg.receiverId,
+    ]);
+    for (const key of results) {
+      if (results[key].userId !== sendMsg.senderId) {
+        pub({ receiverId: results[key].email, type: "wsMsgList" });
+      }
+    }
+  } else {
+    pub({ receiverId: sendMsg.receiverId, type: "wsMsgList" });
+  }
 }
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+export function findChatList(req, res) {
+  try {
+  } catch (err) {
+    console.error(err);
+    return resErr(res, BaseState.ServerErr);
+  }
+}
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+export function createChat(req, res) {}

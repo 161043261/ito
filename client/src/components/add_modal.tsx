@@ -2,17 +2,21 @@ import useToast from '@/hooks/use_toast';
 import { IGroupDto } from '@/types/group';
 import { useState } from 'react';
 import { Button, Empty, Input, Modal, Tabs, TabsProps } from 'antd';
-import { addFriendApi, addSelf2GroupApi, fetchFriendListByNameApi } from '@/apis/friend';
+import { addFriendApi, fetchFriendListByNameApi } from '@/apis/friend';
 import { BaseState } from '@/utils/constants';
 import { Search } from '@icon-park/react';
 import ImgBox from './base64img';
-import { fetchGroupListByNameApi } from '@/apis/group';
+import { addSelf2GroupApi, fetchGroupListByNameApi } from '@/apis/group';
 
 interface IProps {
   mountModal: boolean;
   setMountModal: (doModal: boolean) => void;
 }
 
+/**
+ *
+ * @description Add friend, or add self to group
+ */
 const AddModal: React.FC<IProps> = (props: IProps) => {
   const { mountModal, setMountModal } = props;
   const toast = useToast();
@@ -37,7 +41,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
     }
   };
 
-  const fetchFriendListByName = async (username: string) => {
+  const _fetchFriendListByName = async (username: string) => {
     try {
       if (username === '') {
         setFriendList([]);
@@ -47,17 +51,17 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
       if (res.code === BaseState.Success && res.data) {
         setFriendList(res.data);
       } else {
-        toast.error('查询失败, 请重试');
+        toast.error('查询失败');
         setFriendList([]);
       }
     } catch (err) {
       console.error(err);
-      toast.error('查询失败, 请重试');
+      toast.error('查询失败');
       setFriendList([]);
     }
   };
 
-  const addFriend2group = async (id: number, email: string, avatar: string) => {
+  const handleAddFriend = async (id: number, email: string, avatar: string) => {
     setLoading(true);
     try {
       const res = await addFriendApi({ id, email, avatar });
@@ -66,12 +70,12 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
         setLoading(false);
         setMountModal(false);
       } else {
-        toast.error('添加失败, 请重试');
+        toast.error('添加失败');
         setLoading(false);
       }
     } catch (err) {
       console.error(err);
-      toast.error('添加失败, 请重试');
+      toast.error('添加失败');
       setLoading(false);
     }
   };
@@ -83,7 +87,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
     }
   };
 
-  const fetchGroupListByName = async (groupName: string) => {
+  const _fetchGroupListByName = async (groupName: string) => {
     try {
       if (groupName === '') {
         setGroupList([]);
@@ -93,17 +97,17 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
       if (res.code === BaseState.Success && res.data) {
         setGroupList(res.data);
       } else {
-        toast.error('查询失败, 请重试');
+        toast.error('查询失败');
         setGroupList([]);
       }
     } catch (err) {
       console.error(err);
-      toast.error('查询失败, 请重试');
+      toast.error('查询失败');
       setGroupList([]);
     }
   };
 
-  const addSelf2group = async (groupId: number) => {
+  const handleAddSelf2group = async (groupId: number) => {
     setLoading(true);
     try {
       const res = await addSelf2GroupApi({ groupId });
@@ -112,17 +116,17 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
         setLoading(false);
         setMountModal(false);
       } else {
-        toast.error('加入群聊失败, 请重试');
+        toast.error('加入群聊失败');
         setLoading(false);
       }
     } catch (err) {
       console.error(err);
-      toast.error('加入群聊失败, 请重试');
+      toast.error('加入群聊失败');
       setLoading(false);
     }
   };
 
-  const items: TabsProps['items'] = [
+  const tabItems: TabsProps['items'] = [
     {
       key: 'addFriend',
       label: '加好友',
@@ -134,7 +138,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
               prefix={<Search theme="outline" size="24" fill="#333" />}
               onChange={(ev) => handleFriendNameChange(ev)}
             />
-            <Button type="primary" onClick={() => fetchFriendListByName(friendName)}>
+            <Button type="primary" onClick={() => _fetchFriendListByName(friendName)}>
               查找
             </Button>
           </div>
@@ -154,7 +158,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
                   ) : (
                     <Button
                       className="justify-self-center"
-                      onClick={() => addFriend2group(item.id, item.email, item.avatar)}
+                      onClick={() => handleAddFriend(item.id, item.email, item.avatar)}
                       loading={isLoading}
                     >
                       加好友
@@ -178,7 +182,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
               prefix={<Search theme="outline" size="24" fill="#333" />}
               onChange={handleGroupNameChange}
             />
-            <Button type="primary" onClick={() => fetchGroupListByName(groupName)}>
+            <Button type="primary" onClick={() => _fetchGroupListByName(groupName)}>
               查找
             </Button>
           </div>
@@ -198,7 +202,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
                   ) : (
                     <Button
                       className="justify-self-center"
-                      onClick={() => addSelf2group(item.id)}
+                      onClick={() => handleAddSelf2group(item.id)}
                       loading={isLoading}
                     >
                       加入群聊
@@ -212,6 +216,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
       ),
     },
   ];
+
   return (
     <div>
       <Modal
@@ -221,7 +226,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
           setMountModal(false);
         }}
       >
-        <Tabs defaultActiveKey="addFriend" items={items} />
+        <Tabs defaultActiveKey="addFriend" items={tabItems} />
       </Modal>
     </div>
   );

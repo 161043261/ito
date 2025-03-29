@@ -6,6 +6,7 @@ export interface IGroupItem {
   readme: string; // groups 表字段 readme, 群公告
   roomKey: string; // groups 表字段 room_key, 房间号
   avatar: string; // groups 表字段 avatar, 群聊头像
+  createdAt: string; // groups 表字段 created_at, 创建时间
 }
 
 export interface IGroupMemberItem {
@@ -15,9 +16,17 @@ export interface IGroupMemberItem {
   userId: number; // group_members 表字段 user_id, 成员的用户 ID
 }
 
-export interface IGroupInfo extends IGroupItem {
+export interface IGroupExt extends IGroupItem {
   // 补充字段
   ownerEmail: string; // 群主的邮箱
+  members: IGroupMemberExt[];
+}
+
+export interface IGroupMemberExt extends IGroupMemberItem {
+  avatar: string;
+  latestMsgTime?: string;
+  email: string;
+  username: string;
 }
 
 export interface IGroupDto {

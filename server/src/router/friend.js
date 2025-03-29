@@ -2,7 +2,7 @@ import express from "express";
 import auth from "../utils/auth.js";
 import {
   addFriend,
-  addTag,
+  createTag,
   findFriendList,
   findTagList,
   findFriendById,
@@ -22,8 +22,8 @@ export default function createFriendRouter() {
   router.get("/", auth, findFriendById);
   //! /api/v1/friend/tag-list
   router.get("/tag-list", auth, findTagList);
-  //! /api/v1/friend/add-tag
-  router.post("/add-tag", auth, addTag);
+  //! /api/v1/friend/create-tag
+  router.post("/create-tag", auth, createTag);
   //! /api/v1/friend/update
   router.post("/update", auth, updateFriend);
   return router;

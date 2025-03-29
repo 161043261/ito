@@ -215,20 +215,20 @@ export async function startPub(ws, req) {
   const url = req.url.split("?")[1];
   const params = new URLSearchParams(url);
   const curEmail = params.get("email");
-  global.onlineUsers[curEmail] = {
+  global.OnlineUsers[curEmail] = {
     ws,
     state: false, // 用户是否在音视频通话
   };
-  for (const email in global.onlineUsers) {
+  for (const email in global.OnlineUsers) {
     if (email === curEmail) {
       continue;
     }
     pub({ receiverEmail: email, type: "wsFriendList" });
   }
   ws.on("close", () => {
-    if (global.onlineUsers[curEmail]) {
-      delete global.onlineUsers[curEmail];
-      for (const email in global.onlineUsers) {
+    if (global.OnlineUsers[curEmail]) {
+      delete global.OnlineUsers[curEmail];
+      for (const email in global.OnlineUsers) {
         pub({ receiverEmail: email, type: "wsFriendList" });
       }
     }

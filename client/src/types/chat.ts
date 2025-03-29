@@ -1,12 +1,12 @@
-export enum TabType {
-  P2p = 'p2p',
+export enum MsgType {
+  Friend = 'friend',
   Group = 'group',
 }
 
-export interface ChatInfo {
+export interface ChatItem {
   chatId: number; // 好友 ID 或群聊 ID
   chatName: string; // 好友备注 (好友名) 或群聊备注 (群聊名)
-  receiverName: string; // 好友的用户名, 有该字段, 说明是单聊, 不是群聊
+  receiverName: string; // 好友的用户名, 有该字段, 说明是好友, 不是群聊
   isGroup: boolean; // 是不是群聊
   unreadCnt: number; // 未读消息数
   latestMsg: string; // 最新消息
@@ -24,8 +24,8 @@ export interface IMsgItem {
   roomKey: string; // messages 表字段 room_key, 房间号
   senderId: number; // messages 表字段 sender_id, 发送者的用户 ID
   state: 0 | 1; // messages 表字段 state, 消息状态
-  // type: p2p | group
-  type: TabType; // messages 表字段 type, 消息类型
+  // type: friend | group
+  type: MsgType; // messages 表字段 type, 消息类型
 }
 
 export interface IMsgStatItem {

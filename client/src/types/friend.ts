@@ -23,12 +23,10 @@ export interface IFriendItem {
   roomKey: string; // friends 表字段 room_key, 房间号
 }
 
-export interface IFriendInfo extends IFriendItem {
+export interface IFriendExt extends IFriendItem {
   // 补充属性
   friendId: number; // 同 IFriendItem.id
   friendUserId: number;
-  groupId: number;
-  groupName: string;
   username: string; // 好友的用户名
   signature: string; // 好友的签名
   flag: boolean;

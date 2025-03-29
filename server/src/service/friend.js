@@ -117,7 +117,7 @@ export async function addFriend(req, res) {
         user_id: sender.id, // 所属用户 ID
         email, // 好友邮箱
         avatar, // 好友头像
-        state: global.onlineUsers[email] ? "online" : "offline", // 好友状态
+        state: global.OnlineUsers[email] ? "online" : "offline", // 好友状态
         note_name: email, // 好友备注
         tag_id: senderTags[0].id, // 好友的标签 ID
         room_key: roomKey, // 房间号
@@ -127,7 +127,7 @@ export async function addFriend(req, res) {
         user_id: id,
         email: sender.email,
         avatar: sender.avatar,
-        state: global.onlineUsers[sender.email] ? "online" : "offline",
+        state: global.OnlineUsers[sender.email] ? "online" : "offline",
         note_name: sender.email,
         tag_id: receiverTags[0].id,
         room_key: roomKey,
@@ -243,13 +243,13 @@ export async function findTagList(req, res) {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-export async function addTag(req, res) {
+export async function createTag(req, res) {
+  // userId, userEmail, name
   const tag = req.body;
   if (!tag) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
-    console.warn("tag:", tag, "camel2snake(tag):", tag);
     const { affectedRows } = await query("insert into tags set ?", camel2snake(tag));
     if (affectedRows === 1) {
       return resOk(res);

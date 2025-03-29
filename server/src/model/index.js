@@ -207,7 +207,7 @@ create table if not exists messages
   -- 房间号
   room_key    varchar(255)                            not null,
   -- 消息类型
-  type        enum ('p2p', 'group')              not null,
+  type        enum ('friend', 'group')              not null,
   -- 媒体类型
   media_type  enum ('text', 'image', 'video', 'file') not null,
   -- 文件大小, 单位 B
