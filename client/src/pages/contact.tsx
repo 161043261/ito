@@ -6,7 +6,7 @@ import type { IGroupExt, IGroupItem } from '@/types/group';
 import type { ITagItem } from '@/types/friend';
 import { Button, Empty, Form, Input, Modal, Select, Tabs, TabsProps, Tooltip } from 'antd';
 import { useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import RoundImg from '@/components/round_img';
+import ImgContainer from '@/components/img_container';
 import {
   addTagApi,
   fetchFriendByIdApi,
@@ -93,7 +93,7 @@ const Contact: React.FC<IProps> = ({ ref, startChat }: IProps /** props */) => {
         key: friend.id, // number
         title: (
           <div className="flex items-center justify-between">
-            <RoundImg src={friend.avatar} className="h-20" />
+            <ImgContainer src={friend.avatar} className="h-20" />
             <div>{friend.noteName}</div>
             <div>{friend.state === 'online' ? '在线' : '离线'}</div>
           </div>
@@ -299,7 +299,7 @@ const Contact: React.FC<IProps> = ({ ref, startChat }: IProps /** props */) => {
                 className="flex h-20 cursor-pointer items-center justify-between rounded-3xl hover:bg-slate-100"
               >
                 <div className="flex-1">
-                  <RoundImg src={item.avatar} className="h-18" />
+                  <ImgContainer src={item.avatar} className="h-18" />
                 </div>
                 <div className="flex-2 truncate">{item.name}</div>
               </div>
@@ -390,7 +390,7 @@ const Contact: React.FC<IProps> = ({ ref, startChat }: IProps /** props */) => {
           {curTab === TabKey.Friend && curFriend && (
             <div className="mx-[20%]">
               <div className="flex items-center py-10">
-                <RoundImg src={curFriend.avatar} className="h-40 w-40" />
+                <ImgContainer src={curFriend.avatar} className="h-40 w-40" />
                 <div className="ml-10">
                   <div>{curFriend.username}</div>
                   <div>{curFriend.signature ?? '这个人很神秘, 没有签名'}</div>
@@ -428,7 +428,7 @@ const Contact: React.FC<IProps> = ({ ref, startChat }: IProps /** props */) => {
           {curTab === TabKey.Group && curGroup && (
             <div className="mx-[20%]">
               <div className="flex items-center py-10">
-                <RoundImg src={curGroup.avatar} className="h-40 w-40" />
+                <ImgContainer src={curGroup.avatar} className="h-40 w-40" />
                 <div className="ml-10">
                   <div>{curGroup.name}</div>
                   <div>{curGroup.readme ?? '这个群很神秘, 没有群公告'}</div>
@@ -470,7 +470,7 @@ const Contact: React.FC<IProps> = ({ ref, startChat }: IProps /** props */) => {
         {mountCreateGroupModal && (
           <CreateGroupModal
             mountModal={mountCreateGroupModal}
-            group={curGroup}
+            groupDetail={curGroup}
             setMountModal={setMountCreateGroupModal}
             type="addFriends"
           />

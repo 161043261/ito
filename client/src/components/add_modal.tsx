@@ -5,7 +5,7 @@ import { Button, Empty, Input, Modal, Tabs, TabsProps } from 'antd';
 import { addFriendApi, fetchFriendListByEmailApi } from '@/apis/friend';
 import { BaseState } from '@/utils/constants';
 import { Search } from '@icon-park/react';
-import RoundImg from './round_img';
+import ImgContainer from './img_container';
 import { addSelf2GroupApi, fetchGroupListByNameApi } from '@/apis/group';
 
 interface IProps {
@@ -32,7 +32,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
   const [groupList, setGroupList] = useState<IGroupDto[]>([]);
   const [friendEmail, setFriendEmail] = useState('');
   const [groupName, setGroupName] = useState('');
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFriendNameChange = (ev: { target: { value: string } }) => {
     setFriendEmail(ev.target.value);
@@ -62,21 +62,21 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
   };
 
   const handleAddFriend = async (id: number, email: string, avatar: string) => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const res = await addFriendApi({ id, email, avatar });
       if (res.code === BaseState.Ok) {
         toast.success('添加成功');
-        setLoading(false);
+        setIsLoading(false);
         setMountModal(false);
       } else {
         toast.error('添加失败');
-        setLoading(false);
+        setIsLoading(false);
       }
     } catch (err) {
       console.error(err);
       toast.error('添加失败');
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -108,21 +108,21 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
   };
 
   const handleAddSelf2group = async (groupId: number) => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const res = await addSelf2GroupApi({ groupId });
       if (res.code === BaseState.Ok) {
         toast.success('加入群聊成功');
-        setLoading(false);
+        setIsLoading(false);
         setMountModal(false);
       } else {
         toast.error('加入群聊失败');
-        setLoading(false);
+        setIsLoading(false);
       }
     } catch (err) {
       console.error(err);
       toast.error('加入群聊失败');
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -148,7 +148,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
             <div className="mt-3 flex flex-col gap-y-3">
               {friendList.map((item) => (
                 <div key={item.id} className="grid grid-cols-4 items-center">
-                  <RoundImg src={item.avatar} className="h-20 rounded-full" />
+                  <ImgContainer src={item.avatar} className="h-20 rounded-full" />
                   <div className="col-span-2 truncate">
                     <div>邮箱 {item.email}</div>
                     <div>用户名 {item.username}</div>
@@ -192,7 +192,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
             <div className="mt-3 flex flex-col gap-y-3">
               {groupList.map((item) => (
                 <div key={item.id} className="grid grid-cols-4 items-center">
-                  <RoundImg src={item.avatar} className="h-20 rounded-full" />
+                  <ImgContainer src={item.avatar} className="h-20 rounded-full" />
                   <div className="col-span-2 truncate">
                     <div>群聊名 {item.name}</div>
                     <div>群聊人数 {item.memberNum} </div>

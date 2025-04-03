@@ -20,7 +20,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isRemember, setRemember] = useState(false);
   const [loginFormInst] = Form.useForm<ILoginForm>();
   const [mountModal, setMountModal] = useState(false);
@@ -62,12 +62,12 @@ const Login: React.FC = () => {
       toast.success('登录成功');
       return navigate('/');
     }
-    setLoading(true);
+    setIsLoading(true);
     const reqData = { email, password };
     const res = await loginApi(reqData);
     if (res.code === BaseState.Ok && res.data) {
       toast.success('登录成功');
-      setLoading(false);
+      setIsLoading(false);
       const { token, userInfo } = res.data;
       tokenStore.setToken(token);
       userInfoStore.setUserInfo(userInfo);
@@ -78,7 +78,7 @@ const Login: React.FC = () => {
     }
 
     toast.error('登录失败');
-    setLoading(false);
+    setIsLoading(false);
   };
 
   const handleRemember = () => {

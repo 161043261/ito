@@ -17,14 +17,14 @@ export default function Register() {
   const toast = useToast();
   const [registerFormInst] = Form.useForm<IRegisterForm>();
 
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async (form: IRegisterForm) => {
     const { email, password, confirmPwd } = form;
     if (password !== confirmPwd) {
       return toast.error('两次输入的密码不同');
     }
-    setLoading(true);
+    setIsLoading(true);
     try {
       const reqData = {
         email,
@@ -32,7 +32,7 @@ export default function Register() {
         avatar: genBase64(),
       };
       const res = await registerApi(reqData);
-      setLoading(false);
+      setIsLoading(false);
       if (res.code === BaseState.Ok) {
         toast.success('注册成功');
         navigate('/login');
@@ -41,7 +41,7 @@ export default function Register() {
       }
     } catch (err) {
       console.error('[pages/register]', err);
-      setLoading(false);
+      setIsLoading(false);
       toast.error('注册失败');
     }
   };

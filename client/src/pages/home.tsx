@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { logoutApi } from '@/apis/user';
-import RoundImg from '@/components/round_img';
+import ImgContainer from '@/components/img_container';
 import useToast from '@/hooks/use_toast';
 import useUserInfoStore from '@/store/user_info';
 
@@ -95,7 +95,7 @@ const Home: React.FC = () => {
   const UserInfoContent = (
     <div>
       <div className="flex h-30 w-100 gap-5">
-        <RoundImg src={userInfo.avatar} className="h-30 w-30" />
+        <ImgContainer src={userInfo.avatar} className="h-30 w-30" />
         <div className="flex h-30 w-65 flex-col justify-between">
           <div className="flex flex-col gap-3">
             <div>{userInfo.username}</div>
@@ -187,7 +187,7 @@ const Home: React.FC = () => {
             <li className="w-[100%]">
               <Popover content={UserInfoContent} placement="right">
                 <div className="flex items-center justify-center">
-                  <RoundImg src={userInfo.avatar} className="w-[80%] cursor-pointer" />
+                  <ImgContainer src={userInfo.avatar} className="w-[80%] cursor-pointer" />
                 </div>
               </Popover>
             </li>

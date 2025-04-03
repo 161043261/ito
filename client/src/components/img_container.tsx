@@ -6,14 +6,14 @@ interface IProps {
   className?: string;
 }
 
-export default function RoundImg(props: IProps) {
+export default function ImgContainer(props: IProps) {
   const { src, alt, className } = props;
   return (
     <img
       src={src}
       onError={(ev) => {
         // todo: Uncomment
-        console.error('avatar error:', src);
+        // console.error('avatar error:', src);
         ev.currentTarget.src = genBase64();
       }}
       alt={alt ?? 'img'}
