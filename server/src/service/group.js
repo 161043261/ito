@@ -56,7 +56,7 @@ export async function createGroup(req, res) {
       avatar,
       readme,
       room_key: roomKey,
-      owner_id: req.userInfo.id,
+      creator_id: req.userInfo.id,
       unread_cnt: 0,
     });
     if (affectedRows === 1) {
@@ -180,21 +180,21 @@ export async function findGroupById(req, res) {
     const sql = `
 select g.id,
        g.name,
-       g.owner_id,
+       g.creator_id,
        u.email as owner_email,
        g.avatar,
        g.readme,
        g.room_key,
        g.created_at
 from \`groups\` g
-       join users u on g.owner_id = u.id
+       join users u on g.creator_id = u.id
 where g.id = ?;
   `;
     const [
       {
         id,
         name,
-        owner_id: ownerId,
+        creator_id: creatorId,
         owner_email: ownerEmail,
         avatar,
         readme,
@@ -205,7 +205,7 @@ where g.id = ?;
     const groupData = {
       id,
       name,
-      ownerId,
+      creatorId,
       ownerEmail,
       avatar,
       readme,

@@ -137,7 +137,7 @@ create table if not exists \`groups\`
   -- 群聊名
   name       varchar(255) not null,
   -- 群主的用户 ID
-  owner_id   int(31)      not null,
+  creator_id   int(31)      not null,
   -- 房间号
   room_key   varchar(255) not null unique,
   -- 群聊头像
@@ -148,8 +148,8 @@ create table if not exists \`groups\`
   unread_cnt int(31)   default 0,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp on update current_timestamp,
-  index idx_creator_id (owner_id),
-  foreign key (owner_id) references users (id) on delete cascade
+  index idx_creator_id (creator_id),
+  foreign key (creator_id) references users (id) on delete cascade
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;

@@ -3,18 +3,18 @@
 <img src="./assets/ito.png" alt="ito" width="416" />
 
 ```txt
-+------------+      
-| users      |      
-+------------+      
-| avatar     |      
-| created_at |      
-| email      |      
-| id         |      
-| password   |      
-| signature  |      
-| updated_at |      
-| username   |    
-+------------+    
++------------+
+| users      |
++------------+
+| avatar     |
+| created_at |
+| email      |
+| id         |
+| password   |
+| signature  |
+| updated_at |
+| username   |
++------------+
 
 +------------+
 | friends    |
@@ -49,7 +49,7 @@
 | created_at |
 | id         |
 | name       |
-| owner_id   |
+| creator_id   |
 | readme     |
 | room_key   |
 | unread_cnt |

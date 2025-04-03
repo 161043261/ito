@@ -2,7 +2,7 @@ export interface IGroupItem {
   // groups 表字段
   id: number; // groups 表字段 id, 群聊 ID
   name: string; // groups 表字段 name, 群聊名
-  ownerId: number; // groups 表字段 owner_id, 群主的用户 ID
+  creatorId: number; // groups 表字段 creator_id, 群主的用户 ID
   readme: string; // groups 表字段 readme, 群公告
   roomKey: string; // groups 表字段 room_key, 房间号
   avatar: string; // groups 表字段 avatar, 群聊头像
