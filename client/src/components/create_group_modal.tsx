@@ -1,11 +1,13 @@
 import { FriendList, IFriendItem } from '@/types/friend';
-import { IGroupExt } from '@/types/group';
-import { Button, Form, Modal, Tree } from 'antd';
+import { ICreateGroupDto, IGroupExt } from '@/types/group';
+import { Button, Form, Input, Modal, Tree } from 'antd';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ImgContainer from './img_container';
 import useToast from '@/hooks/use_toast';
 import { fetchFriendListApi } from '@/apis/friend';
-import { BaseState } from '@/utils/constants';
+import { BaseState, GroupState } from '@/utils/constants';
+import ImgUploader from './img_uploader';
+import { addFriends2groupApi, createGroupApi } from '@/apis/group';
 
 interface IProps {
   mountModal: boolean;
@@ -24,7 +26,7 @@ const CreateGroupModal: React.FC<IProps> = (props: IProps) => {
   const [friendId2friend, setFriendId2friend] = useState<Record<number, IFriendItem>>({});
 
   const [isLoading, setIsLoading] = useState(false);
-  const [createGroupFormInst] = Form.useForm<IProps>();
+  const [createGroupFormInst] = Form.useForm<ICreateGroupDto>();
   const stepRef = useRef<HTMLDivElement | null>(null); // 第一步
   const stepRef2 = useRef<HTMLDivElement | null>(null); // 第二步
 
@@ -36,7 +38,7 @@ const CreateGroupModal: React.FC<IProps> = (props: IProps) => {
       disabled: taggedFriends.friends.length === 0,
       children: taggedFriends.friends.map((friend) => ({
         title: (
-          <div>
+          <div className="flex items-center gap-5">
             <ImgContainer src={friend.avatar} />
             <div>{friend.noteName}</div>
           </div>
@@ -78,10 +80,6 @@ const CreateGroupModal: React.FC<IProps> = (props: IProps) => {
 
   const switchStep = (step: 0 | 1 | 2) => {
     switch (step) {
-      case 0:
-        toast.error('至少邀请 1 位好友');
-        break;
-
       case 1:
         if (stepRef.current && stepRef2.current) {
           stepRef.current.style.opacity = '1'; // 不透明度 1
@@ -95,8 +93,12 @@ const CreateGroupModal: React.FC<IProps> = (props: IProps) => {
 
       case 2:
         if (stepRef.current && stepRef2.current) {
-          stepRef.current.style.display = '0'; // 不透明度 0
-          stepRef2.current.style.display = '1'; // 不透明度 1
+          if (checkedFriendList.length === 0) {
+            toast.error('至少邀请 1 位好友');
+            break;
+          }
+          stepRef.current.style.opacity = '0'; // 不透明度 0
+          stepRef2.current.style.opacity = '1'; // 不透明度 1
           setTimeout(() => {
             stepRef.current!.style.display = 'none';
             stepRef2.current!.style.display = 'block';
@@ -122,8 +124,73 @@ const CreateGroupModal: React.FC<IProps> = (props: IProps) => {
     );
   }, [friendList]);
 
-  const createGroup = async () => {};
-  const addFriends2group = async () => {};
+  const createGroup = async ({
+    groupName,
+    groupAvatar,
+    readme,
+  }: Omit<ICreateGroupDto, 'memberList'>) => {
+    if (checkedFriendList.length === 0) {
+      toast.error('至少邀请 1 位好友');
+      return;
+    }
+    setIsLoading(true);
+    const memberList = checkedFriendList.map((item) => ({
+      userId: item.userId,
+      email: item.email,
+      avatar: item.avatar,
+    }));
+    try {
+      const res = await createGroupApi({
+        groupName,
+        groupAvatar,
+        readme,
+        memberList,
+      });
+      if (res.code === BaseState.Ok) {
+        toast.success('创建群聊成功');
+        handleCancel();
+        return; // 仍会执行 finally 块
+      } else {
+        toast.error('创建群聊失败');
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addFriends2group = async () => {
+    if (checkedFriendList.length === 0) {
+      toast.error('至少邀请 1 位好友');
+      return;
+    }
+    const friendList = checkedFriendList.map((item) => ({
+      userId: item.userId,
+      email: item.email,
+      avatar: item.avatar,
+    }));
+    try {
+      const res = await addFriends2groupApi({
+        groupId: groupDetail!.id,
+        friendList,
+      });
+      if (res.code === BaseState.Ok) {
+        toast.success('邀请成功');
+        handleCancel();
+        return;
+      }
+      if (res.code === GroupState.FriendJoined) {
+        toast.warning('邀请的好友已加入');
+      } else {
+        toast.error('邀请失败');
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -131,41 +198,70 @@ const CreateGroupModal: React.FC<IProps> = (props: IProps) => {
         title={type === 'addFriends' ? '邀请好友' : '创建群聊'}
         open={mountModal}
         onCancel={handleCancel}
+        footer={null}
       >
-        <div className="flex">
-          <div className="flex-1">
-            <div>好友列表</div>
-            {FriendsTree}
+        <div ref={stepRef} className="duration-1000">
+          <div className="flex">
+            <div className="flex-1">
+              <div>好友列表</div>
+              {FriendsTree}
+            </div>
+            <div className="flex-1">
+              <div>已选择的好友</div>
+              {checkedFriendList.map((item) => {
+                return (
+                  <div key={item.id} className="mt-1.5 flex items-center gap-5">
+                    <ImgContainer className="w-8" src={item.avatar} />
+                    <div>{item.noteName}</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div className="flex-1">
-            <div>已选择的好友</div>
-            {checkedFriendList.map((item) => {
-              return (
-                <div key={item.id} className="mt-2 flex items-center justify-between">
-                  <ImgContainer className="w-10" src={item.avatar} />
-                  <div>{item.noteName}</div>
-                </div>
-              );
-            })}
+          <div className="flex flex-row-reverse">
+            {type === 'addFriends' ? (
+              <Button onClick={addFriends2group} loading={isLoading}>
+                邀请
+              </Button>
+            ) : (
+              <Button onClick={() => switchStep(2)}>下一步</Button>
+            )}
           </div>
         </div>
 
-        <div>
-          {type === 'addFriends' ? (
-            <Button onClick={addFriends2group} loading={isLoading}>
-              邀请
-            </Button>
-          ) : (
-            <Button onClick={() => switchStep(2)}>下一步</Button>
-          )}
-        </div>
-        <div ref={stepRef}>
+        <div ref={stepRef2} className="hidden duration-1000">
           <Form form={createGroupFormInst} onFinish={createGroup}>
             <Form.Item
-              label="头像"
+              label="群聊头像"
               rules={[{ required: true, message: '请上传群聊头像' }]}
               name="avatar"
-            ></Form.Item>
+            >
+              <ImgUploader
+                onUploadOk={(filePath) => {
+                  createGroupFormInst.setFieldsValue({ groupAvatar: filePath });
+                }}
+              />
+            </Form.Item>
+            <Form.Item
+              label="群聊名"
+              rules={[{ required: true, message: '请输入群聊名' }]}
+              name="name" // groupName
+            >
+              <Input maxLength={15} showCount={true} placeholder="请输入群聊名" />
+            </Form.Item>
+            <Form.Item
+              label="群公告"
+              rules={[{ required: true, message: '请输入群公告' }]}
+              name="readme"
+            >
+              <Input maxLength={30} showCount={true} placeholder="请输入群公告" />
+            </Form.Item>
+            <Form.Item>
+              <Button onClick={() => switchStep(1)}>上一步</Button>
+              <Button type="primary" htmlType="submit" loading={isLoading}>
+                确定
+              </Button>
+            </Form.Item>
           </Form>
         </div>
       </Modal>

@@ -1,12 +1,12 @@
 import useToast from '@/hooks/use_toast';
-import { IGroupDto } from '@/types/group';
+import { IFetchGroupListByNameDto } from '@/types/group';
 import { useState } from 'react';
 import { Button, Empty, Input, Modal, Tabs, TabsProps } from 'antd';
 import { addFriendApi, fetchFriendListByEmailApi } from '@/apis/friend';
 import { BaseState } from '@/utils/constants';
 import { Search } from '@icon-park/react';
 import ImgContainer from './img_container';
-import { addSelf2GroupApi, fetchGroupListByNameApi } from '@/apis/group';
+import { addSelf2groupApi, fetchGroupListByNameApi } from '@/apis/group';
 
 interface IProps {
   mountModal: boolean;
@@ -29,7 +29,7 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
       username: string;
     }[]
   >([]);
-  const [groupList, setGroupList] = useState<IGroupDto[]>([]);
+  const [groupList, setGroupList] = useState<IFetchGroupListByNameDto[]>([]);
   const [friendEmail, setFriendEmail] = useState('');
   const [groupName, setGroupName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -67,15 +67,14 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
       const res = await addFriendApi({ id, email, avatar });
       if (res.code === BaseState.Ok) {
         toast.success('添加成功');
-        setIsLoading(false);
         setMountModal(false);
       } else {
         toast.error('添加失败');
-        setIsLoading(false);
       }
     } catch (err) {
       console.error(err);
       toast.error('添加失败');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -110,18 +109,17 @@ const AddModal: React.FC<IProps> = (props: IProps) => {
   const handleAddSelf2group = async (groupId: number) => {
     setIsLoading(true);
     try {
-      const res = await addSelf2GroupApi({ groupId });
+      const res = await addSelf2groupApi({ groupId });
       if (res.code === BaseState.Ok) {
         toast.success('加入群聊成功');
-        setIsLoading(false);
         setMountModal(false);
       } else {
         toast.error('加入群聊失败');
-        setIsLoading(false);
       }
     } catch (err) {
       console.error(err);
       toast.error('加入群聊失败');
+    } finally {
       setIsLoading(false);
     }
   };

@@ -1,13 +1,30 @@
-import { IAddSelf2groupDto, IGroupDto, IGroupExt, IGroupItem } from '@/types/group';
+import {
+  IAddFriends2groupDto,
+  IAddSelf2groupDto,
+  ICreateGroupDto,
+  IFetchGroupListByNameDto,
+  IGroupExt,
+  IGroupItem,
+} from '@/types/group';
 import request from '@/utils/request';
 
-export async function addSelf2GroupApi(data: IAddSelf2groupDto) {
-  const res = await request.post<IAddSelf2groupDto>('/group/add-self', data);
+export async function addSelf2groupApi(params: IAddSelf2groupDto) {
+  const res = await request.post<IAddSelf2groupDto>('/group/add-self', params);
+  return res.data;
+}
+
+export async function addFriends2groupApi(params: IAddFriends2groupDto) {
+  const res = await request.post<IAddFriends2groupDto>('/group/add-friends', params);
+  return res.data;
+}
+
+export async function createGroupApi(params: ICreateGroupDto) {
+  const res = await request.post<ICreateGroupDto>('/group/create', params);
   return res.data;
 }
 
 export async function fetchGroupListByNameApi(groupName: string) {
-  const res = await request.get<IGroupDto[]>(`/group/name?name=${groupName}`);
+  const res = await request.get<IFetchGroupListByNameDto[]>(`/group/name?name=${groupName}`);
   return res.data;
 }
 
@@ -16,6 +33,10 @@ export async function fetchGroupById(groupId: number) {
   return res.data;
 }
 
+/**
+ *
+ * @description Fetch current user's group list
+ */
 export async function fetchGroupListApi() {
   const res = await request.get<IGroupItem[]>('group/list');
   return res.data;

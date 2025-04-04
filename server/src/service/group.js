@@ -6,7 +6,7 @@ import { BaseState, GroupState } from "../utils/state.js";
 import { resOk, resErr } from "../utils/res.js";
 import pub from "../utils/pub.js";
 import query from "../utils/query.js";
-import { camel2snake, snack2camel } from "../utils/fmt.js";
+import { snack2camel } from "../utils/fmt.js";
 
 /**
  *
@@ -41,19 +41,19 @@ from (select user_id, users.avatar, users.email, users.username, nickname, group
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
- * @description post: name, avatar, readme, members
- * @description members: { userId, email, avatar }
+ * @description post: name, avatar, readme, memberList
+ * @description memberList: { userId, email, avatar }
  */
 export async function createGroup(req, res) {
-  const { name, avatar, readme, members } = req.body;
-  if (!name) {
+  const { groupName, groupAvatar, readme, memberList } = req.body;
+  if (!groupName) {
     return resErr(res, BaseState.ParamErr);
   }
   try {
     const roomKey = uuid();
     const { affectedRows, insertId } = await query("insert into `groups` set ?", {
-      name,
-      avatar,
+      name: groupName,
+      avatar: groupAvatar,
       readme,
       room_key: roomKey,
       creator_id: req.userInfo.id,
@@ -74,12 +74,12 @@ export async function createGroup(req, res) {
       ]);
 
       // Add self
-      members.push({
+      memberList.push({
         userId: req.userInfo.id,
         email: req.userInfo.email,
         avatar: req.userInfo.avatar,
       });
-      for (const member of members) {
+      for (const member of memberList) {
         await query("insert into group_members set ?", {
           group_id: insertId,
           user_id: member.userId,
@@ -145,16 +145,16 @@ export async function findGroupListByName(req, res) {
     }
     const { id: userId } = req.userInfo;
     for (const groupWrap of groupWraps) {
-      const members = await query("select user_id from group_members where group_id = ?", [
+      const userIdWraps = await query("select user_id from group_members where group_id = ?", [
         groupWrap.id,
       ]);
       //! name, avatar, memberNum, flag, id
       retList.push({
         name: groupWrap.name,
         avatar: groupWrap.avatar,
-        memberNum: members.length,
+        memberNum: userIdWraps.length,
         // 是否已加入
-        flag: members.some((item) => item.user_id === userId),
+        flag: userIdWraps.some((item) => item.user_id === userId),
         id: groupWrap.id, // groupId
       });
     }
@@ -211,12 +211,12 @@ where g.id = ?;
       readme,
       roomKey,
       createdAt,
-      members: [],
+      memberList: [],
     };
-    groupData.members = await selectGroupMembers(groupId, groupData.roomKey);
-    // const members = await selectGroupMembers(groupId, groupData.roomKey);
-    // for (const member of members) {
-    //   groupData.members.push({ ...member });
+    groupData.memberList = await selectGroupMembers(groupId, groupData.roomKey);
+    // const memberList = await selectGroupMembers(groupId, groupData.roomKey);
+    // for (const member of memberList) {
+    //   groupData.memberList.push({ ...member });
     // }
     return resOk(res, groupData);
   } catch (err) {
@@ -251,7 +251,11 @@ export async function addFriends2group(req, res) {
     }
     await query(
       "insert into group_members set ?",
-      filteredList.map((item) => camel2snake(item)),
+      filteredList.map((item) => ({
+        group_id: groupId,
+        user_id: item.userId,
+        nickname: item.email,
+      })),
     );
     for (const item of filteredList) {
       // todo pub({ receiverEmail: item.nickname, type: "wsFetchGroupList" });

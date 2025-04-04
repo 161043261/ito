@@ -13,8 +13,8 @@ import { IUploadChunkParams } from '@/types/file';
 export function uploadFile(
   file: File,
   chunkSize: number,
-  maxRetries: number,
-  retryDelay: number,
+  maxRetries?: number,
+  retryDelay?: number,
   onProgress?: (progress: number) => void,
 ): Promise<{
   done: boolean;
@@ -69,8 +69,8 @@ async function postUploadFile(
   file: File,
   chunkList: ArrayBuffer[],
   fileHash: string,
-  maxRetries: number,
-  retryDelay: number,
+  maxRetries?: number,
+  retryDelay?: number,
   onProgress?: (progress: number) => void,
 ): Promise<{
   done: boolean;

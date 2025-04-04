@@ -21,7 +21,7 @@ export interface IGroupMemberItem {
 export interface IGroupExt extends IGroupItem {
   // 补充字段
   ownerEmail: string; // 群主的邮箱
-  members: IGroupMemberExt[];
+  memberList: IGroupMemberExt[];
 }
 
 export interface IGroupMemberExt extends Omit<IGroupMemberItem, 'id' | 'groupId'> {
@@ -34,14 +34,34 @@ export interface IGroupMemberExt extends Omit<IGroupMemberItem, 'id' | 'groupId'
   // createdAt: string;
 }
 
-export interface IAddSelf2groupDto {
-  groupId: number;
-}
-
-export interface IGroupDto {
+export interface IFetchGroupListByNameDto {
   avatar: string;
   id: number;
   name: string;
   memberNum: number;
   flag: boolean;
+}
+
+export interface IAddSelf2groupDto {
+  groupId: number;
+}
+
+export interface IAddFriends2groupDto {
+  groupId: number;
+  friendList: {
+    userId: number;
+    email: string;
+    avatar: string;
+  }[];
+}
+
+export interface ICreateGroupDto {
+  groupAvatar: string;
+  groupName: string;
+  readme: string;
+  memberList: {
+    userId: number;
+    email: string;
+    avatar: string;
+  }[];
 }

@@ -32,7 +32,6 @@ export default function Register() {
         avatar: genBase64(),
       };
       const res = await registerApi(reqData);
-      setIsLoading(false);
       if (res.code === BaseState.Ok) {
         toast.success('注册成功');
         navigate('/login');
@@ -41,8 +40,9 @@ export default function Register() {
       }
     } catch (err) {
       console.error('[pages/register]', err);
-      setIsLoading(false);
       toast.error('注册失败');
+    } finally {
+      setIsLoading(false);
     }
   };
 

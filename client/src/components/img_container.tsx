@@ -6,14 +6,19 @@ interface IProps {
   className?: string;
 }
 
+// src 可能是 base64, 也可能是 url, 也可能是 /uploads/image
 export default function ImgContainer(props: IProps) {
-  const { src, alt, className } = props;
+  const { alt, className } = props;
+  let src = props.src;
+  if (src.startsWith('uploads/')) {
+    console.log(src);
+    src = `${import.meta.env.VITE_SERVER_URL}/${src}`;
+  }
   return (
     <img
       src={src}
       onError={(ev) => {
-        // todo: Uncomment
-        // console.error('avatar error:', src);
+        console.error(src);
         ev.currentTarget.src = genBase64();
       }}
       alt={alt ?? 'img'}

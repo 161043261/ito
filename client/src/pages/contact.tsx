@@ -316,7 +316,7 @@ const Contact: React.FC<IProps> = ({ ref, startChat }: IProps /** props */) => {
       children: (
         <div>
           <div>群主: {curGroup?.ownerEmail}</div>
-          <div>群聊人数: {curGroup?.members.length}</div>
+          <div>群聊人数: {curGroup?.memberList.length}</div>
           <div>创建时间: {curGroup?.createdAt.split('.')[0].replace('T', '')}</div>
         </div>
       ),
@@ -333,7 +333,7 @@ const Contact: React.FC<IProps> = ({ ref, startChat }: IProps /** props */) => {
             <li className="flex-1 font-bold">最后发言时间</li>
           </ul>
           <div>
-            {curGroup?.members.map((item) => (
+            {curGroup?.memberList.map((item) => (
               <ul key={item.userId} className="flex">
                 <li className="flex-1">{item.username}</li>
                 <li className="flex-1">{item.nickname}</li>
