@@ -261,6 +261,8 @@ export async function addFriends2group(req, res) {
       // todo pub({ receiverEmail: item.nickname, type: "wsFetchGroupList" });
       pub({ receiverEmail: item.email, type: "wsFetchGroupList" });
     }
+    // todo
+    // pub({receiverEmail: req.userInfo.email, type: "wsFetchGroupList" })
     return resOk(res);
   } catch (err) {
     console.error(err);

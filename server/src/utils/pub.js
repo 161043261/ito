@@ -5,6 +5,7 @@ import query from "./query.js";
  * @description type: wsFetchFriendList, wsFetchGroupList, wsFetchMsgList, wsCreateRtcRoom
  */
 export default async function pub(data) {
+  console.log("Publish:", data);
   let receiverEmail = data.receiverEmail;
   if (!receiverEmail) {
     const emailWraps = query("select email from users where id = ?", [data.receiverId]);

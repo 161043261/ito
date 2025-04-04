@@ -10,6 +10,10 @@ import '@/assets/styles/tailwind.css';
 import '@/assets/styles/global.scss';
 import '@ant-design/v5-patch-for-react-19';
 
+// localStorage.removeItem('userInfo');
+// localStorage.removeItem('token');
+// localStorage.removeItem('isRemember');
+
 const container = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(container);
 
