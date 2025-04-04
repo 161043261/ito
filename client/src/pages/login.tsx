@@ -7,12 +7,12 @@ import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 import { loginApi } from '@/apis/user';
 import { BaseState } from '@/utils/constants';
-import { IUserInfo, ILoginReqData } from '@/types/user';
+import { IUserInfo, ILoginParams } from '@/types/user';
 
 import styles from './login.module.scss';
 
 const Login: React.FC = () => {
-  type ILoginForm = ILoginReqData;
+  type ILoginForm = ILoginParams;
 
   const tokenStore = useTokenStore();
   const userInfoStore = useUserInfoStore();

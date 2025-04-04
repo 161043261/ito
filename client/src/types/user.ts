@@ -9,23 +9,23 @@ export interface IUserInfo {
   createdAt?: string;
 }
 
-export interface ILoginReqData {
+export interface ILoginParams {
   email: string;
   password: string;
 }
 
-export interface ILoginResData {
+export interface ILoginRes {
   token: string;
   userInfo: IUserInfo;
 }
 
-export interface IRegisterReqData {
+export interface IRegisterParams {
   email: string;
   password: string;
   avatar: string; // random
 }
 
-export interface IRegisterResData {
+export interface IRegisterRes {
   token: string;
   userInfo: {
     //! id, email, password, username, avatar, signature
@@ -43,5 +43,3 @@ export interface IReceiver {
   alias: string; // 备注 noteName 或群昵称 nickname 或用户名 username
   avatar: string;
 }
-
-export interface ISender {}

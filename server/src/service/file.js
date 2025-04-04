@@ -8,31 +8,37 @@ import path from "node:path";
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
- * @description post: fileHash, totalCnt, extName
+ * @description post: fileHash, chunkCnt, extName
  */
 export async function verifyFile(req, res) {
-  const { fileHash, totalCnt /**  chunks count */, extName: rawExtName } = req.body;
-  if (!fileHash || !totalCnt || !rawExtName) {
+  const { fileHash, chunkCnt, extName: rawExtName } = req.body;
+  if (!fileHash || !chunkCnt || !rawExtName) {
     return resErr(res, BaseState.ParamErr);
   }
   const extName = rawExtName.split(".").at(-1)?.toLowerCase();
   const fileType = getFileType(extName);
   const chunkDirAbsPath = path.join(process.cwd(), `uploads/${fileType}/${fileHash}`);
   const fileAbsPath = chunkDirAbsPath + "." + extName;
-  const fileRelPath = `uploads/${fileType}/${fileHash}.${extName}`;
-  let chunkIdxArr = new Array(totalCnt).fill(0).map((_val, idx) => idx + 1);
+  const filePath = `uploads/${fileType}/${fileHash}.${extName}`; // relative
+  let missChunkIdxArr = new Array(chunkCnt).fill(0).map((_val, idx) => idx);
 
   try {
     await fs.stat(fileAbsPath);
-    return response(res, FileState.FileUploaded /** code */, fileRelPath /** data */);
+    return response(
+      res,
+      FileState.FileUploaded, // code
+      { filePath }, // data
+    );
   } catch {
     try {
       await fs.stat(chunkDirAbsPath);
       const chunks = await fs.readdir(chunkDirAbsPath);
-      if (chunks.length < totalCnt) {
-        chunkIdxArr = chunkIdxArr.filter((chunkIdx) => !chunks.includes(`chunk-${chunkIdx}`));
+      if (chunks.length < chunkCnt) {
+        missChunkIdxArr = missChunkIdxArr.filter(
+          (chunkIdx) => !chunks.includes(`chunk-${chunkIdx}`),
+        );
         // 部分分块未上传
-        return resOk(res, chunkIdxArr /** data */);
+        return resOk(res, { missChunkIdxArr, filePath } /** data */);
       } else {
         // 分块全部上传, 等待合并
         return response(res, FileState.ChunksUploaded /** code */);
@@ -41,7 +47,7 @@ export async function verifyFile(req, res) {
       console.error(err);
       //// await fs.mkdir(chunkDirAbsPath, { recursive: true });
       // 全部分块未上传
-      return resOk(res, chunkIdxArr /** data */);
+      return resOk(res, { missChunkIdxArr, filePath } /** data */);
     }
   }
 }
@@ -89,7 +95,7 @@ export async function uploadChunk(req, res) {
  * @param {import("express").Response} res
  * @description post: fileHash, extName
  */
-export async function mergeChunk(req, res) {
+export async function mergeChunks(req, res) {
   const { fileHash, extName: rawExtName } = req.body;
   if (!fileHash || !rawExtName) {
     return resErr(res, BaseState.ParamErr);
@@ -103,16 +109,16 @@ export async function mergeChunk(req, res) {
   // extName = 'jpg'
   // dirAbsPath = '/path/to/uploads/image/161043261'
   // fileAbsPath = '/path/to/uploads/image/161043261.jpg'
-  // fileRelPath = 'uploads/image/161043261.jpg'
+  // filePath = 'uploads/image/161043261.jpg'
 
   /** @description Chunks directory absolute path */
   const chunkDirAbsPath = path.join(process.cwd(), `uploads/${fileType}/${fileHash}`);
   const fileAbsPath = chunkDirAbsPath + "." + extName;
-  const fileRelPath = `uploads/${fileType}/${fileHash}.${extName}`;
+  const filePath = `uploads/${fileType}/${fileHash}.${extName}`;
 
   try {
     await fs.access(fileAbsPath);
-    return resOk(res);
+    return resOk(res, { filePath });
   } catch (err) {
     console.error(err);
   }
@@ -152,7 +158,7 @@ export async function mergeChunk(req, res) {
     console.error(err);
     // resErr(res, 'mergeChunkErr');
   }
-  return resOk(res, fileRelPath);
+  return resOk(res, { filePath });
 }
 
 /**

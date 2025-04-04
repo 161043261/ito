@@ -1,6 +1,6 @@
 import { registerApi } from '@/apis/user';
 import useToast from '@/hooks/use_toast';
-import { ILoginReqData } from '@/types/user';
+import { ILoginParams } from '@/types/user';
 import { BaseState } from '@/utils/constants';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
@@ -10,7 +10,7 @@ import { Button, Form, Input } from 'antd';
 import { genBase64 } from '@/utils/img';
 
 export default function Register() {
-  type IRegisterForm = ILoginReqData & {
+  type IRegisterForm = ILoginParams & {
     confirmPwd: string;
   };
   const navigate = useNavigate();

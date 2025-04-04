@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { verifyFile, uploadChunk, mergeChunk } from "../service/file.js";
+import { verifyFile, uploadChunk, mergeChunks } from "../service/file.js";
 import auth from "../utils/auth.js";
 
 const router = express.Router();
@@ -18,6 +18,6 @@ export default function createFileRouter() {
     uploadChunk,
   );
   //! /api/v1/file/merge
-  router.post("/merge", auth, mergeChunk);
+  router.post("/merge", auth, mergeChunks);
   return router;
 }
