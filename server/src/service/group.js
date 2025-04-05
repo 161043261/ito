@@ -254,15 +254,13 @@ export async function addFriends2group(req, res) {
       filteredList.map((item) => ({
         group_id: groupId,
         user_id: item.userId,
-        nickname: item.email,
+        nickname: item.email, // 默认昵称
       })),
     );
     for (const item of filteredList) {
-      // todo pub({ receiverEmail: item.nickname, type: "wsFetchGroupList" });
       pub({ receiverEmail: item.email, type: "wsFetchGroupList" });
     }
-    // todo
-    // pub({receiverEmail: req.userInfo.email, type: "wsFetchGroupList" })
+    // pub({ receiverEmail: req.userInfo.email, type: "wsFetchGroupList" });
     return resOk(res);
   } catch (err) {
     console.error(err);
