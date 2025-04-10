@@ -1,9 +1,9 @@
 import { Spin } from 'antd';
-import { IRoute } from './conf';
+import { IRoute } from './routes';
 import { Navigate, Route, Routes } from 'react-router';
 import { Suspense, useMemo } from 'react';
 
-import { routes } from './conf';
+import { routes } from './routes';
 
 const AntdSpin = () => (
   <div className="flex h-dvh items-center justify-center">
