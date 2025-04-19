@@ -25,7 +25,7 @@ function cors(req, res, next) {
   res.header("Content-type", "application/json;charset=utf-8");
   // 预检 (pre-flight) 请求
   if (req.method.toLowerCase() === "options") {
-    res.sendStatus(200);
+    res.sendStatus(204);
   } else {
     next();
   }
@@ -45,7 +45,7 @@ function staticHandler(req, res, next) {
   res.header("Content-Type", "application/octet-stream");
   // 预检 (pre-flight) 请求
   if (req.method.toLowerCase() === "options") {
-    res.sendStatus(200);
+    res.sendStatus(204);
   } else {
     next();
   }
