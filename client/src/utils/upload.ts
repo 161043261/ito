@@ -2,6 +2,10 @@ import { mergeChunksApi, uploadChunkApi, verifyFileApi } from '@/apis/file';
 import { BaseState, Code2Msg, FileState } from './constants';
 import { IUploadChunkParams } from '@/types/file';
 
+// 1. 使用 spark-md5 + webworker 对文件分片, 并计算 hash 值, 得到 chunkList
+// 2. 携带 fileHash 请求服务器, 判断文件上传状态 verifyFile: 文件重复上传? 分块全部上传, 等待合并? 部分分块未上传? 服务器返回 pendingChunkIdxArr 等待上传的分块序号数组
+// 3. 发送分块上传/合并请求
+
 /**
  *
  * @param targetFile 上传的文件
@@ -27,10 +31,13 @@ export function uploadFile(
       type: 'module',
     });
     let fileHash = '';
-    sliceWorker.postMessage({
-      file,
-      chunkSize,
-    });
+    sliceWorker.postMessage(
+      {
+        file,
+        chunkSize,
+      },
+      { transfer: [file] }, // 转移所有权
+    );
     sliceWorker.onmessage = async (ev) => {
       switch (ev.data.msgType) {
         case 'progress':
@@ -40,7 +47,7 @@ export function uploadFile(
           chunkList.push(...ev.data.chunkList);
           fileHash = ev.data.fileHash;
           try {
-            const res = await postUploadFile(
+            const res = await verifyThenMergeOrUpload(
               file,
               chunkList,
               fileHash,
@@ -65,7 +72,7 @@ export function uploadFile(
   });
 }
 
-async function postUploadFile(
+async function verifyThenMergeOrUpload(
   file: File,
   chunkList: ArrayBuffer[],
   fileHash: string,
@@ -84,7 +91,7 @@ async function postUploadFile(
 
   const filename = file.name;
   const extName = filename.split('.').at(-1) ?? '';
-  let missChunkIdxArr: number[] = [];
+  let pendingChunkIdxArr: number[] = [];
   let progress = 0;
 
   try {
@@ -128,7 +135,7 @@ async function postUploadFile(
 
     // 部分分块未上传
     if (res.code === BaseState.Ok) {
-      const { missChunkIdxArr: idxArr } = res.data;
+      const { pendingChunkIdxArr: idxArr } = res.data;
       if (idxArr.length === 0) {
         return {
           done: true,
@@ -136,7 +143,7 @@ async function postUploadFile(
           msg: Code2Msg.get(res.code),
         };
       }
-      missChunkIdxArr = idxArr;
+      pendingChunkIdxArr = idxArr;
     } else {
       throw Code2Msg.get(res.code); //! reject
     }
@@ -145,9 +152,9 @@ async function postUploadFile(
     throw err; //! reject
   }
 
-  progress = ((chunkList.length - missChunkIdxArr.length) / chunkList.length) * 100;
-  const reqList = chunkList.map(async (chunk, idx) => {
-    if (missChunkIdxArr.includes(idx)) {
+  progress = ((chunkList.length - pendingChunkIdxArr.length) / chunkList.length) * 100;
+  const asyncUploadReqList = chunkList.map(async (chunk, idx) => {
+    if (pendingChunkIdxArr.includes(idx)) {
       const params = {
         chunk,
         chunkIdx: idx,
@@ -171,7 +178,7 @@ async function postUploadFile(
   });
 
   try {
-    await Promise.all(reqList);
+    await Promise.all(asyncUploadReqList);
     try {
       const params = {
         fileHash,

@@ -29,7 +29,7 @@ async function sliceFile(file: File, baseChunkSize: number) {
     // 已分块的数量
     let doneCnt = 0;
     // 创建 SparkMd5 对象
-    const spark = new SparkMd5.ArrayBuffer();
+    const sparkMd5arrBuf = new SparkMd5.ArrayBuffer();
     // 创建读文件对象
     const fileReader = new FileReader();
     // 分块数组
@@ -56,7 +56,7 @@ async function sliceFile(file: File, baseChunkSize: number) {
     fileReader.onload = async (ev) => {
       const curChunk = ev.target?.result as ArrayBuffer;
       chunkList.push(curChunk);
-      spark.append(curChunk);
+      sparkMd5arrBuf.append(curChunk);
       doneCnt++;
 
       if (chunkList.length >= 10) {
@@ -69,7 +69,7 @@ async function sliceFile(file: File, baseChunkSize: number) {
 
       if (doneCnt >= chunkCnt) {
         workerMsg.msgType = 'ok';
-        workerMsg.fileHash = spark.end();
+        workerMsg.fileHash = sparkMd5arrBuf.end(); // hexHash
         self.postMessage(workerMsg);
         resolve(null);
       } else {
@@ -77,10 +77,11 @@ async function sliceFile(file: File, baseChunkSize: number) {
       }
     };
 
-    fileReader.onerror = (ev) => {
+    fileReader.onerror = (ev: ProgressEvent) => {
       workerMsg.msgType = 'err';
       self.postMessage(workerMsg);
-      reject(ev.target?.error);
+      console.error(ev);
+      reject(null);
     };
 
     loadNext();

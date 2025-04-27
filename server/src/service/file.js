@@ -19,7 +19,7 @@ export async function verifyFile(req, res) {
   const chunkDirAbsPath = path.join(process.cwd(), `uploads/${fileType}/${fileHash}`);
   const fileAbsPath = chunkDirAbsPath + "." + extName;
   const filePath = `uploads/${fileType}/${fileHash}.${extName}`; // relative
-  let missChunkIdxArr = new Array(chunkCnt).fill(0).map((_val, idx) => idx);
+  let pendingChunkIdxArr = new Array(chunkCnt).fill(0).map((_val, idx) => idx);
 
   try {
     await fs.stat(fileAbsPath);
@@ -33,11 +33,11 @@ export async function verifyFile(req, res) {
       await fs.stat(chunkDirAbsPath);
       const chunks = await fs.readdir(chunkDirAbsPath);
       if (chunks.length < chunkCnt) {
-        missChunkIdxArr = missChunkIdxArr.filter(
+        pendingChunkIdxArr = pendingChunkIdxArr.filter(
           (chunkIdx) => !chunks.includes(`chunk-${chunkIdx}`),
         );
         // 部分分块未上传
-        return resOk(res, { missChunkIdxArr, filePath } /** data */);
+        return resOk(res, { pendingChunkIdxArr, filePath } /** data */);
       } else {
         // 分块全部上传, 等待合并
         return response(res, FileState.ChunksUploaded /** code */);
@@ -46,7 +46,7 @@ export async function verifyFile(req, res) {
       // console.error(err);
       //// await fs.mkdir(chunkDirAbsPath, { recursive: true });
       // 全部分块未上传
-      return resOk(res, { missChunkIdxArr, filePath } /** data */);
+      return resOk(res, { pendingChunkIdxArr, filePath } /** data */);
     }
   }
 }
