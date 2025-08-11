@@ -45,7 +45,7 @@
 | created_at |
 | id         |
 | name       |
-| creator_id   |
+| creator_id |
 | readme     |
 | room_key   |
 | unread_cnt |
